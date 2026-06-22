@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Halla Health · Trial Feasibility · Endometriosis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f7f6f3;
+    --surface: #ffffff;
+    --surface2: #f2f1ee;
+    --border: #e4e2dc;
+    --border2: #d0cec7;
+    --text: #1a1917;
+    --text2: #6b6860;
+    --text3: #9c9a95;
+    --accent: #2d5be3;
+    --accent-bg: #eef1fd;
+    --green: #0f6e56;
+    --green-bg: #e1f5ee;
+    --amber: #854f0b;
+    --amber-bg: #faeeda;
+    --red: #a32d2d;
+    --red-bg: #fcebeb;
+    --purple: #534ab7;
+    --purple-bg: #eeedfe;
+    --teal: #0f6e56;
+    --teal-bg: #e1f5ee;
+    --radius: 8px;
+    --radius-lg: 12px;
+    --font: 'Inter', system-ui, sans-serif;
+    --mono: 'IBM Plex Mono', monospace;
+  }
+
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  /* ── Layout ── */
+  .shell { max-width: 960px; margin: 0 auto; padding: 0 24px 60px; }
+
+  /* ── Header ── */
+  .header {
+    padding: 32px 0 24px;
+    border-bottom: 0.5px solid var(--border);
+    margin-bottom: 24px;
+  }
+  .header-top { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+  .logo-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .logo-dot { width: 28px; height: 28px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; }
+  .logo-dot i { color: #fff; font-size: 15px; }
+  .brand { font-size: 15px; font-weight: 600; color: var(--text); letter-spacing: -0.01em; }
+  .header h1 { font-size: 26px; font-weight: 600; letter-spacing: -0.02em; color: var(--text); margin-bottom: 6px; }
+  .header p { font-size: 13px; color: var(--text2); max-width: 540px; line-height: 1.6; }
+  .tag-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+  .tag { padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 500; border: 0.5px solid; }
+  .tag-purple { background: var(--purple-bg); color: var(--purple); border-color: #c5c2f0; }
+  .tag-amber { background: var(--amber-bg); color: var(--amber); border-color: #f4c97a; }
+  .tag-green { background: var(--green-bg); color: var(--green); border-color: #9fe1cb; }
+  .tag-blue { background: var(--accent-bg); color: var(--accent); border-color: #b5d4f4; }
+  .tag-red { background: var(--red-bg); color: var(--red); border-color: #f7c1c1; }
+
+  /* ── Assumptions banner ── */
+  .assumptions {
+    background: var(--accent-bg);
+    border: 0.5px solid #b5d4f4;
+    border-radius: var(--radius-lg);
+    padding: 12px 16px;
+    margin-bottom: 24px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .assumptions i { color: var(--accent); font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+  .assumptions p { font-size: 12px; color: #185fa5; line-height: 1.6; }
+  .assumptions strong { color: var(--accent); }
+
+  /* ── Nav tabs ── */
+  .nav { display: flex; gap: 4px; margin-bottom: 24px; border-bottom: 0.5px solid var(--border); padding-bottom: 0; overflow-x: auto; }
+  .nav button {
+    padding: 8px 14px;
+    border: none;
+    background: transparent;
+    color: var(--text2);
+    font-size: 13px;
+    font-family: var(--font);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -0.5px;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: color 0.15s;
+  }
+  .nav button:hover { color: var(--text); }
+  .nav button.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 500; }
+  .nav button i { font-size: 15px; }
+
+  /* ── Views ── */
+  .view { display: none; }
+  .view.active { display: block; }
+
+  /* ── Metric grid ── */
+  .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 20px; }
+  .metric { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 14px 16px; }
+  .metric .lbl { font-size: 11px; color: var(--text3); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.04em; }
+  .metric .val { font-size: 24px; font-weight: 600; color: var(--text); letter-spacing: -0.02em; }
+  .metric .sub { font-size: 11px; color: var(--text3); margin-top: 3px; }
+
+  /* ── Cards ── */
+  .card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 16px 20px; margin-bottom: 16px; }
+  .card-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 14px; display: flex; align-items: center; gap: 6px; }
+  .card-title i { color: var(--text3); font-size: 16px; }
+
+  /* ── 2-col grid ── */
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 640px) { .row2 { grid-template-columns: 1fr; } }
+
+  /* ── Table ── */
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; padding: 7px 10px; color: var(--text3); font-weight: 500; font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 0.5px solid var(--border); }
+  td { padding: 9px 10px; border-bottom: 0.5px solid var(--border); color: var(--text); vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: var(--surface2); }
+
+  /* ── Progress bar ── */
+  .progress-track { background: var(--surface2); border-radius: 4px; height: 6px; margin-top: 5px; overflow: hidden; }
+  .progress-fill { height: 6px; border-radius: 4px; transition: width 0.5s ease; }
+
+  /* ── Controls ── */
+  .controls { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
+  .controls label { font-size: 12px; color: var(--text3); }
+  select {
+    padding: 6px 10px; border-radius: var(--radius); border: 0.5px solid var(--border2);
+    background: var(--surface); color: var(--text); font-size: 13px; font-family: var(--font); cursor: pointer;
+  }
+  select:focus { outline: none; border-color: var(--accent); }
+
+  /* ── Filter chips ── */
+  .filter-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+  .filter-chip {
+    padding: 5px 12px; border-radius: 20px; border: 0.5px solid var(--border);
+    font-size: 12px; cursor: pointer; background: transparent; color: var(--text2); font-family: var(--font);
+    transition: all 0.15s;
+  }
+  .filter-chip:hover { border-color: var(--border2); color: var(--text); }
+  .filter-chip.on { background: var(--text); color: #fff; border-color: var(--text); }
+
+  /* ── Segment grid ── */
+  .segment-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+  .seg-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 14px 16px; }
+  .seg-card .seg-icon { font-size: 22px; color: var(--text3); margin-bottom: 8px; }
+  .seg-card .seg-label { font-size: 11px; color: var(--text3); margin-bottom: 4px; line-height: 1.4; }
+  .seg-card .seg-num { font-size: 22px; font-weight: 600; color: var(--text); letter-spacing: -0.02em; }
+  .seg-card .seg-sub { font-size: 10px; color: var(--text3); margin-top: 2px; }
+
+  /* ── Field tag list ── */
+  .field-list { display: flex; flex-direction: column; gap: 8px; }
+  .field-row { display: flex; align-items: flex-start; gap: 8px; font-size: 12px; color: var(--text2); line-height: 1.5; }
+
+  /* ── Site rows ── */
+  .site-row { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 0.5px solid var(--border); }
+  .site-row:last-child { border-bottom: none; }
+  .site-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .section-label { font-size: 10px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.07em; margin: 12px 0 4px; }
+
+  /* ── Storyline ── */
+  .story-step { display: flex; gap: 12px; padding: 10px 0; border-bottom: 0.5px solid var(--border); }
+  .story-step:last-child { border-bottom: none; }
+  .story-num { font-family: var(--mono); font-size: 12px; font-weight: 500; min-width: 20px; padding-top: 1px; }
+  .story-text { font-size: 13px; color: var(--text2); line-height: 1.6; }
+
+  /* ── Scenario box ── */
+  .scenario-box { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 14px; text-align: center; }
+  .scenario-box .sc-tag { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+  .scenario-box .sc-desc { font-size: 11px; color: var(--text3); margin-bottom: 10px; line-height: 1.4; }
+  .scenario-box .sc-vals { display: flex; justify-content: center; gap: 12px; }
+  .scenario-box .sc-country { font-size: 11px; color: var(--text3); }
+  .scenario-box .sc-country span { display: block; font-size: 16px; font-weight: 600; color: var(--text); }
+  .scenario-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-top: 16px; }
+
+  /* ── Footer ── */
+  .footer {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 0.5px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .footer p { font-size: 11px; color: var(--text3); }
+  .footer-badge { font-size: 11px; color: var(--amber); background: var(--amber-bg); border: 0.5px solid #f4c97a; padding: 3px 10px; border-radius: 20px; }
+
+  /* ── Canvas wrappers ── */
+  .chart-wrap { position: relative; width: 100%; }
+
+  /* ── Divider label ── */
+  .divider-label { font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.06em; margin: 20px 0 10px; }
+
+  /* ── Legend ── */
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 10px; }
+  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text3); }
+  .legend-dot { width: 9px; height: 9px; border-radius: 2px; }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-top">
+      <div>
+        <div class="logo-row">
+          <div class="logo-dot"><i class="ti ti-heart-rate-monitor"></i></div>
+          <span class="brand">Halla Health</span>
+        </div>
+        <h1>Trial Feasibility Dashboard</h1>
+        <p>Self-reported disease signals → geographically distributed patient availability → trial-relevant recruitment estimates</p>
+        <div class="tag-row">
+          <span class="tag tag-purple">Endometriosis / Pelvic pain</span>
+          <span class="tag tag-blue">Phase II feasibility</span>
+          <span class="tag tag-green">Finland · Sweden · India</span>
+          <span class="tag tag-amber">Synthetic demo data · June 2026</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Assumptions -->
+  <div class="assumptions">
+    <i class="ti ti-info-circle"></i>
+    <p><strong>Assumptions panel —</strong> All data is synthetic for demo purposes. Disease status is self-reported unless indicated. Diagnosis confidence is modelled. Recruitment estimates are illustrative. Contactability requires appropriate consent. Country comparisons depend on Halla Health user penetration. Estimates should be validated with epidemiology, claims, registry, or site-level data before operational decisions.</p>
+  </div>
+
+  <!-- Nav -->
+  <div class="nav" role="tablist">
+    <button class="active" onclick="switchView('signal')" role="tab" aria-selected="true"><i class="ti ti-map-2"></i> Disease signal</button>
+    <button onclick="switchView('funnel')" role="tab"><i class="ti ti-filter"></i> Eligibility funnel</button>
+    <button onclick="switchView('sites')" role="tab"><i class="ti ti-building-hospital"></i> Site catchment</button>
+    <button onclick="switchView('profiles')" role="tab"><i class="ti ti-users"></i> Patient profiles</button>
+    <button onclick="switchView('scenarios')" role="tab"><i class="ti ti-adjustments"></i> Scenarios</button>
+  </div>
+
+  <!-- ───────────── VIEW 1: Disease Signal ───────────── -->
+  <div id="view-signal" class="view active">
+    <div class="metrics">
+      <div class="metric"><div class="lbl">Total user pool</div><div class="val">1.54M</div><div class="sub">Halla Health users</div></div>
+      <div class="metric"><div class="lbl">Symptom / dx signal</div><div class="val">116K</div><div class="sub">Across all markets</div></div>
+      <div class="metric"><div class="lbl">Confirmed diagnosis</div><div class="val">77K</div><div class="sub">~66% confirmation rate</div></div>
+      <div class="metric"><div class="lbl">Eligible proxy cohort</div><div class="val">7,470</div><div class="sub">After all filters</div></div>
+      <div class="metric"><div class="lbl">Countries</div><div class="val">3</div><div class="sub">FI · SE · IN</div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><i class="ti ti-chart-bar"></i> Geographic disease signal — self-reported endometriosis</div>
+      <div class="chart-wrap" style="height:220px"><canvas id="geoChart" role="img" aria-label="Bar chart comparing Finland, Sweden and India on estimated cases, confirmed diagnosis and eligible proxy cohort">Finland: 4,200 cases, 2,856 confirmed, 620 eligible. Sweden: 8,700 cases, 6,177 confirmed, 1,050 eligible. India: 42,000 cases, 27,300 confirmed, 5,800 eligible.</canvas></div>
+      <div class="legend">
+        <span class="legend-item"><span class="legend-dot" style="background:#378ADD"></span>Estimated cases</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#1D9E75"></span>Confirmed diagnosis</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#BA7517"></span>Eligible proxy cohort</span>
+      </div>
+    </div>
+
+    <div class="row2">
+      <div class="card">
+        <div class="card-title"><i class="ti ti-table"></i> Market summary</div>
+        <table>
+          <thead><tr><th>Country</th><th>Cases</th><th>Confirmed</th><th>Mod/sev</th><th>Contactable</th><th>Eligible</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Finland</strong></td><td>4,200</td><td><span class="tag tag-green" style="font-size:10px">68%</span></td><td>42%</td><td>55%</td><td><strong>620</strong></td></tr>
+            <tr><td><strong>Sweden</strong></td><td>8,700</td><td><span class="tag tag-green" style="font-size:10px">71%</span></td><td>38%</td><td>49%</td><td><strong>1,050</strong></td></tr>
+            <tr><td><strong>India</strong></td><td>42,000</td><td><span class="tag tag-amber" style="font-size:10px">65%</span></td><td>44%</td><td>51%</td><td><strong>5,800</strong></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <div class="card-title"><i class="ti ti-activity"></i> Key disease variable distribution</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span style="color:var(--text2)">Prior hormonal therapy</span><span style="font-weight:600">50–70%</span></div><div class="progress-track"><div class="progress-fill" style="width:60%;background:#378ADD"></div></div></div>
+          <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span style="color:var(--text2)">Moderate-to-severe symptoms</span><span style="font-weight:600">35–50%</span></div><div class="progress-track"><div class="progress-fill" style="width:42%;background:#1D9E75"></div></div></div>
+          <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span style="color:var(--text2)">Prior surgery</span><span style="font-weight:600">20–40%</span></div><div class="progress-track"><div class="progress-fill" style="width:30%;background:#BA7517"></div></div></div>
+          <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span style="color:var(--text2)">Willing to join research registry</span><span style="font-weight:600">35–60%</span></div><div class="progress-track"><div class="progress-fill" style="width:48%;background:#7F77DD"></div></div></div>
+          <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span style="color:var(--text2)">Willing to travel &gt;100 km</span><span style="font-weight:600">10–25%</span></div><div class="progress-track"><div class="progress-fill" style="width:18%;background:#D85A30"></div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───────────── VIEW 2: Eligibility Funnel ───────────── -->
+  <div id="view-funnel" class="view">
+    <div class="controls">
+      <label>Market:</label>
+      <select id="funnelCountry" onchange="renderFunnel()">
+        <option value="fi">Finland</option>
+        <option value="se">Sweden</option>
+        <option value="in">India</option>
+      </select>
+    </div>
+
+    <div class="metrics" id="funnelMetrics"></div>
+
+    <div class="card">
+      <div class="card-title"><i class="ti ti-filter"></i> Recruitment funnel — step-by-step narrowing</div>
+      <div id="funnelBars"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><i class="ti ti-list-check"></i> Eligibility filter detail</div>
+      <table>
+        <thead><tr><th>Variable</th><th>Trial relevance</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>Age 18–45</td><td>Basic inclusion criterion</td><td><span class="tag tag-green">Applied</span></td></tr>
+          <tr><td>Confirmed / high-confidence diagnosis</td><td>Diagnostic inclusion</td><td><span class="tag tag-green">Applied</span></td></tr>
+          <tr><td>Moderate-to-severe disease</td><td>Severity inclusion criterion</td><td><span class="tag tag-green">Applied</span></td></tr>
+          <tr><td>No prior surgery</td><td>Treatment-line criterion</td><td><span class="tag tag-green">Applied</span></td></tr>
+          <tr><td>No severe uncontrolled comorbidity</td><td>Exclusion proxy</td><td><span class="tag tag-amber">Modelled</span></td></tr>
+          <tr><td>Willing to be contacted</td><td>Recruitment feasibility</td><td><span class="tag tag-green">Applied</span></td></tr>
+          <tr><td>Within 100 km of trial site</td><td>Operational feasibility</td><td><span class="tag tag-blue">Geography filter</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ───────────── VIEW 3: Site Catchment ───────────── -->
+  <div id="view-sites" class="view">
+    <div class="metrics">
+      <div class="metric"><div class="lbl">Mock trial sites</div><div class="val">9</div><div class="sub">Major hospital centres</div></div>
+      <div class="metric"><div class="lbl">Patients within 75 km</div><div class="val">3,100</div><div class="sub">Across all sites</div></div>
+      <div class="metric"><div class="lbl">Best single-site pool</div><div class="val">1,200</div><div class="sub">Delhi NCR</div></div>
+      <div class="metric"><div class="lbl">Est. randomised (total)</div><div class="val">430</div><div class="sub">All markets combined</div></div>
+    </div>
+
+    <div class="row2">
+      <div class="card">
+        <div class="card-title"><i class="ti ti-chart-bar"></i> Eligible patients by site</div>
+        <div class="chart-wrap" style="height:280px"><canvas id="siteChart" role="img" aria-label="Horizontal bar chart showing eligible patient counts per mock trial site across India, Sweden and Finland">Delhi NCR 1200, Mumbai 820, Bangalore 680, Stockholm South 410, Stockholm North 280, Gothenburg 190, Helsinki 190, Tampere 110, Turku 90</canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title"><i class="ti ti-building-hospital"></i> Site details</div>
+        <div class="section-label">India</div>
+        <div class="site-row"><div class="site-dot" style="background:#378ADD"></div><div style="flex:1"><div style="font-size:13px;font-weight:500">Delhi NCR</div><div style="font-size:11px;color:var(--text3)">1,200 eligible · 350 est. randomised</div></div><span class="tag tag-green">Tier 1</span></div>
+        <div class="site-row"><div class="site-dot" style="background:#378ADD"></div><div style="flex:1"><div style="font-size:13px;font-weight:500">Mumbai</div><div style="font-size:11px;color:var(--text3)">820 eligible · 280 est. randomised</div></div><span class="tag tag-green">Tier 1</span></div>
+        <div class="site-row"><div class="site-dot" style="background:#378ADD"></div><div style="flex:1"><div style="font-size:13px;font-weight:500">Bangalore</div><div style="font-size:11px;color:var(--text3)">680 eligible · 170 est. randomised</div></div><span class="tag tag-blue">Tier 2</span></div>
+        <div class="section-label">Sweden</div>
+        <div class="site-row"><div class="site-dot" style="background:#1D9E75"></div><div style="flex:1"><div style="font-size:13px;font-weight:500">Stockholm South</div><div style="font-size:11px;color:var(--text3)">410 eligible · 55 est. randomised</div></div><span class="tag tag-green">Tier 1</span></div>
+        <div class="site-row"><div class="site-dot" style="background:#1D9E75"></div><div style="flex:1"><div style="font-size:13px;font-weight:500">Stockholm North</div><div style="font-size:11px;color:var(--text3)">280 eligible · 32 est. randomised</div></div><span class="tag tag-blue">Tier 2</span></div>
+        <div class="section-label">Finland</div>
+        <div class="site-row"><div class="site-dot" style="background:#BA7517"></div><div style="flex:1"><div style="font-size:13px;font-weight:500">Helsinki Central</div><div style="font-size:11px;color:var(--text3)">190 eligible · 25 est. randomised</div></div><span class="tag tag-blue">Tier 2</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><i class="ti ti-map-pin"></i> Eligible patients by distance to nearest site</div>
+      <div class="chart-wrap" style="height:200px"><canvas id="distChart" role="img" aria-label="Stacked bar chart showing patient distribution by distance band across Finland, Sweden and India">Finland, Sweden, India each broken down into under 25km, 25-75km, 75-150km and over 150km bands.</canvas></div>
+      <div class="legend">
+        <span class="legend-item"><span class="legend-dot" style="background:#1D9E75"></span>&lt;25 km</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#378ADD"></span>25–75 km</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#BA7517"></span>75–150 km</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#E24B4A"></span>&gt;150 km</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───────────── VIEW 4: Patient Profiles ───────────── -->
+  <div id="view-profiles" class="view">
+    <div class="filter-row">
+      <button class="filter-chip on" onclick="toggleChip(this)">All segments</button>
+      <button class="filter-chip" onclick="toggleChip(this)">High symptom burden</button>
+      <button class="filter-chip" onclick="toggleChip(this)">Treatment-experienced</button>
+      <button class="filter-chip" onclick="toggleChip(this)">Biologic-naïve</button>
+      <button class="filter-chip" onclick="toggleChip(this)">Underserved / rural</button>
+    </div>
+
+    <div class="segment-grid">
+      <div class="seg-card"><div class="seg-icon"><i class="ti ti-clock-exclamation"></i></div><div class="seg-label">Long diagnostic delay (&gt;5 yrs)</div><div class="seg-num">34%</div><div class="seg-sub">of confirmed cases</div></div>
+      <div class="seg-card"><div class="seg-icon"><i class="ti ti-needle"></i></div><div class="seg-label">Biologic-naïve</div><div class="seg-num">62%</div><div class="seg-sub">of eligible pool</div></div>
+      <div class="seg-card"><div class="seg-icon"><i class="ti ti-pill"></i></div><div class="seg-label">Treatment-experienced</div><div class="seg-num">58%</div><div class="seg-sub">hormonal therapy use</div></div>
+      <div class="seg-card"><div class="seg-icon"><i class="ti ti-activity"></i></div><div class="seg-label">High symptom burden</div><div class="seg-num">41%</div><div class="seg-sub">daily pain reported</div></div>
+      <div class="seg-card"><div class="seg-icon"><i class="ti ti-heart-handshake"></i></div><div class="seg-label">Research-willing</div><div class="seg-num">47%</div><div class="seg-sub">willing to participate</div></div>
+      <div class="seg-card"><div class="seg-icon"><i class="ti ti-map-pin-off"></i></div><div class="seg-label">Rural / underserved</div><div class="seg-num">22%</div><div class="seg-sub">digital recruitment opp.</div></div>
+    </div>
+
+    <div class="row2" style="margin-top:16px">
+      <div class="card">
+        <div class="card-title"><i class="ti ti-chart-donut"></i> Segment share — eligible pool</div>
+        <div class="chart-wrap" style="height:210px"><canvas id="profileChart" role="img" aria-label="Doughnut chart of patient segment shares: biologic-naive 62%, treatment-experienced 58%, high symptom burden 41%, research-willing 47%, rural 22%">Segments: biologic-naive, treatment-experienced, high symptom, research-willing, rural.</canvas></div>
+        <div class="legend" style="margin-top:10px">
+          <span class="legend-item"><span class="legend-dot" style="background:#378ADD"></span>Biologic-naïve</span>
+          <span class="legend-item"><span class="legend-dot" style="background:#1D9E75"></span>Treatment-exp.</span>
+          <span class="legend-item"><span class="legend-dot" style="background:#BA7517"></span>High symptom</span>
+          <span class="legend-item"><span class="legend-dot" style="background:#7F77DD"></span>Research-willing</span>
+          <span class="legend-item"><span class="legend-dot" style="background:#D85A30"></span>Rural</span>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title"><i class="ti ti-database"></i> Individual-level mock data fields</div>
+        <div class="field-list">
+          <div class="field-row"><span class="tag tag-purple" style="flex-shrink:0;font-size:10px">ID</span><span>Synthetic user ID · country · region · city tier · urban/rural</span></div>
+          <div class="field-row"><span class="tag tag-blue" style="flex-shrink:0;font-size:10px">Demo</span><span>Age band · sex · primary language · education proxy · income proxy</span></div>
+          <div class="field-row"><span class="tag tag-green" style="flex-shrink:0;font-size:10px">Disease</span><span>Self-reported diagnosis · comorbidities · severity score · symptom duration · pain days/month</span></div>
+          <div class="field-row"><span class="tag tag-amber" style="flex-shrink:0;font-size:10px">Tx</span><span>Current treatment · prior hormonal therapy · surgeries · treatment satisfaction · specialist use</span></div>
+          <div class="field-row"><span class="tag tag-red" style="flex-shrink:0;font-size:10px">Trial</span><span>Research willingness · consent status · preferred language · distance to nearest mock site</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───────────── VIEW 5: Scenarios ───────────── -->
+  <div id="view-scenarios" class="view">
+    <div class="card">
+      <div class="card-title"><i class="ti ti-adjustments"></i> Protocol scenario comparison — how criteria affect the eligible pool</div>
+      <table>
+        <thead><tr><th>Scenario</th><th>Description</th><th>Finland</th><th>Sweden</th><th>India</th><th>Total</th></tr></thead>
+        <tbody>
+          <tr><td><span class="tag tag-purple">A</span></td><td>Confirmed diagnosis only</td><td>310</td><td>590</td><td>3,700</td><td><strong>4,600</strong></td></tr>
+          <tr><td><span class="tag tag-blue">B</span></td><td>Diagnosis or high-confidence symptom cluster</td><td>480</td><td>920</td><td>5,800</td><td><strong>7,200</strong></td></tr>
+          <tr><td><span class="tag tag-amber">C</span></td><td>Severe disease only</td><td>140</td><td>280</td><td>1,900</td><td><strong>2,320</strong></td></tr>
+          <tr><td><span class="tag tag-green">D</span></td><td>Close to clinic (&lt;25 km) only</td><td>190</td><td>410</td><td>2,600</td><td><strong>3,200</strong></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><i class="ti ti-chart-bar"></i> Scenario visualisation — eligible pool size by country</div>
+      <div class="chart-wrap" style="height:220px"><canvas id="scenarioChart" role="img" aria-label="Grouped bar chart comparing eligible patient counts across four protocol scenarios for Finland, Sweden and India">A: FI 310 SE 590 IN 3700. B: FI 480 SE 920 IN 5800. C: FI 140 SE 280 IN 1900. D: FI 190 SE 410 IN 2600.</canvas></div>
+      <div class="legend">
+        <span class="legend-item"><span class="legend-dot" style="background:#378ADD"></span>Finland</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#1D9E75"></span>Sweden</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#BA7517"></span>India</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><i class="ti ti-route"></i> Recommended demo storyline</div>
+      <div class="story-step"><span class="story-num" style="color:#378ADD">01</span><span class="story-text">Pharma is planning a Phase II trial in endometriosis — traditional feasibility relies on literature, KOL input, and site-level estimates.</span></div>
+      <div class="story-step"><span class="story-num" style="color:#1D9E75">02</span><span class="story-text">Halla Health provides patient-generated signals across countries and regions at scale.</span></div>
+      <div class="story-step"><span class="story-num" style="color:#BA7517">03</span><span class="story-text">The platform identifies where relevant patient populations appear concentrated geographically.</span></div>
+      <div class="story-step"><span class="story-num" style="color:#7F77DD">04</span><span class="story-text">Trial eligibility filters are applied and site catchment areas are modelled.</span></div>
+      <div class="story-step"><span class="story-num" style="color:#D85A30">05</span><span class="story-text">Pharma can compare countries, sites, and protocol scenarios — enabling faster, evidence-based trial planning with reduced recruitment risk.</span></div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <p>Halla Health</p>
+    <span class="footer-badge">Synthetic data — not for operational use</span>
+  </div>
+
+</div>
+
+<script>
+const VIEWS = ['signal','funnel','sites','profiles','scenarios'];
+
+function switchView(id) {
+  VIEWS.forEach(v => {
+    document.getElementById('view-' + v).classList.toggle('active', v === id);
+  });
+  document.querySelectorAll('.nav button').forEach((b, i) => {
+    b.classList.toggle('active', VIEWS[i] === id);
+    b.setAttribute('aria-selected', VIEWS[i] === id ? 'true' : 'false');
+  });
+}
+
+function toggleChip(el) {
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('on'));
+  el.classList.add('on');
+}
+
+// ── Funnel ──
+const funnelData = {
+  fi: [120000, 8400, 5600, 2400, 760, 310, 190, 25],
+  se: [220000, 15800, 10900, 4100, 1350, 590, 410, 55],
+  in: [1200000, 92000, 61000, 26000, 8200, 3700, 2600, 350]
+};
+const funnelLabels = [
+  'Halla Health users',
+  'Symptom / diagnosis signal',
+  'Confirmed / high-confidence diagnosis',
+  'Moderate-to-severe disease',
+  'Meets eligibility proxy',
+  'Contactable & interested',
+  'Near feasible site',
+  'Estimated randomised'
+];
+const funnelColors = ['#9FE1CB','#5DCAA5','#1D9E75','#0F6E56','#378ADD','#185FA5','#7F77DD','#D85A30'];
+
+function renderFunnel() {
+  const key = document.getElementById('funnelCountry').value;
+  const d = funnelData[key];
+  const max = d[0];
+
+  document.getElementById('funnelMetrics').innerHTML = `
+    <div class="metric"><div class="lbl">Starting pool</div><div class="val">${(d[0]/1000).toFixed(0)}K</div><div class="sub">Halla users</div></div>
+    <div class="metric"><div class="lbl">Eligible proxy</div><div class="val">${d[4].toLocaleString()}</div><div class="sub">After all filters</div></div>
+    <div class="metric"><div class="lbl">Contactable</div><div class="val">${d[5].toLocaleString()}</div><div class="sub">Consented & near site</div></div>
+    <div class="metric"><div class="lbl">Est. randomised</div><div class="val">${d[7]}</div><div class="sub">From this market</div></div>`;
+
+  document.getElementById('funnelBars').innerHTML = funnelLabels.map((l, i) => {
+    const pct = Math.round(d[i] / max * 100);
+    return `<div style="margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;color:var(--text2)">
+        <span>${l}</span><span style="font-weight:600;color:var(--text)">${d[i].toLocaleString()}</span>
+      </div>
+      <div class="progress-track"><div class="progress-fill" style="width:${Math.max(pct,1)}%;background:${funnelColors[i]}"></div></div>
+    </div>`;
+  }).join('');
+}
+renderFunnel();
+
+// ── Charts ──
+new Chart(document.getElementById('geoChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Finland', 'Sweden', 'India'],
+    datasets: [
+      { label: 'Estimated cases', data: [4200, 8700, 42000], backgroundColor: '#378ADD' },
+      { label: 'Confirmed diagnosis', data: [2856, 6177, 27300], backgroundColor: '#1D9E75' },
+      { label: 'Eligible proxy cohort', data: [620, 1050, 5800], backgroundColor: '#BA7517' }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: { x: { ticks: { autoSkip: false } }, y: { ticks: { callback: v => v >= 1000 ? (v/1000).toFixed(0)+'K' : v } } }
+  }
+});
+
+new Chart(document.getElementById('siteChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Delhi NCR', 'Mumbai', 'Bangalore', 'Stockholm S', 'Stockholm N', 'Gothenburg', 'Helsinki', 'Tampere', 'Turku'],
+    datasets: [{ label: 'Eligible patients', data: [1200,820,680,410,280,190,190,110,90], backgroundColor: ['#378ADD','#378ADD','#378ADD','#1D9E75','#1D9E75','#1D9E75','#BA7517','#BA7517','#BA7517'] }]
+  },
+  options: {
+    indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: { x: { ticks: { callback: v => v >= 1000 ? (v/1000)+'K' : v } } }
+  }
+});
+
+new Chart(document.getElementById('distChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Finland', 'Sweden', 'India'],
+    datasets: [
+      { label: '<25 km', data: [810, 1740, 16800], backgroundColor: '#1D9E75' },
+      { label: '25–75 km', data: [1470, 3480, 12600], backgroundColor: '#378ADD' },
+      { label: '75–150 km', data: [1050, 2610, 8400], backgroundColor: '#BA7517' },
+      { label: '>150 km', data: [870, 870, 4200], backgroundColor: '#E24B4A' }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: { x: { stacked: true }, y: { stacked: true, ticks: { callback: v => v >= 1000 ? (v/1000)+'K' : v } } }
+  }
+});
+
+new Chart(document.getElementById('profileChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Biologic-naïve', 'Treatment-exp.', 'High symptom', 'Research-willing', 'Rural'],
+    datasets: [{ data: [62, 58, 41, 47, 22], backgroundColor: ['#378ADD','#1D9E75','#BA7517','#7F77DD','#D85A30'], borderWidth: 2, borderColor: '#ffffff' }]
+  },
+  options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, cutout: '60%' }
+});
+
+new Chart(document.getElementById('scenarioChart'), {
+  type: 'bar',
+  data: {
+    labels: ['A: Confirmed dx only', 'B: Dx or symptom cluster', 'C: Severe only', 'D: Close to clinic'],
+    datasets: [
+      { label: 'Finland', data: [310, 480, 140, 190], backgroundColor: '#378ADD' },
+      { label: 'Sweden', data: [590, 920, 280, 410], backgroundColor: '#1D9E75' },
+      { label: 'India', data: [3700, 5800, 1900, 2600], backgroundColor: '#BA7517' }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { ticks: { autoSkip: false, maxRotation: 15 } },
+      y: { ticks: { callback: v => v >= 1000 ? (v/1000)+'K' : v } }
+    }
+  }
+});
+</script>
+</body>
+</html>
