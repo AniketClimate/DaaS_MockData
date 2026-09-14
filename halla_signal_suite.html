@@ -1,0 +1,1758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Halla Health · Signal Intelligence Suite</title>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+/* ══════════════════════════════════════════════════
+   UNIFIED SHELL
+══════════════════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+/* Top navigation */
+#suite-nav{
+  position:fixed;top:0;left:0;right:0;z-index:1000;
+  height:44px;
+  display:flex;align-items:center;
+  background:#111720;
+  border-bottom:1px solid #1E2D44;
+  padding:0 20px;
+  gap:0;
+}
+.sn-brand{display:flex;align-items:center;gap:8px;margin-right:24px;flex-shrink:0}
+.sn-gem{width:22px;height:22px;border-radius:4px;background:#F5E070;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#000;font-family:'Syne',sans-serif}
+.sn-name{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:#EEE8DC;letter-spacing:.01em}
+.sn-divider{width:1px;height:22px;background:#1E2D44;margin-right:20px;flex-shrink:0}
+.sn-tabs{display:flex;gap:2px;flex:1}
+.sn-tab{
+  display:flex;align-items:center;gap:7px;
+  padding:6px 16px;border-radius:4px;
+  font-size:12px;font-weight:500;
+  cursor:pointer;border:none;background:transparent;
+  color:#6A7A90;font-family:'Inter',sans-serif;
+  transition:all .15s;
+  white-space:nowrap;
+}
+.sn-tab:hover{background:#1A2438;color:#EEE8DC}
+.sn-tab.active{background:#1A2438;color:#F5E070}
+.sn-tab .sn-tab-dot{width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.6}
+.sn-tab.active .sn-tab-dot{opacity:1}
+.sn-tab-badge{
+  font-size:9px;padding:1px 5px;border-radius:3px;
+  font-family:'JetBrains Mono',monospace;font-weight:500;
+  background:#0A2010;color:#40B060;
+}
+.sn-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.sn-link{font-size:11px;color:#3A4A60;font-family:'Inter',sans-serif;cursor:pointer;transition:color .12s}
+.sn-link:hover{color:#6A7A90}
+
+/* View containers */
+#view-map{display:block}
+#view-explorer{display:none}
+
+/* ══════════════════════════════════════════════════
+   MAP STYLES (cream theme)
+   prefixed with .map- for isolation where needed
+══════════════════════════════════════════════════ */
+#view-map{
+  background:#F5F2EC;
+  min-height:100vh;
+  padding-top:44px; /* nav height */
+}
+#view-map {
+  --bg:#F5F2EC;--paper:#FDFCF9;--ink:#1C1A16;--muted:#6B6558;--faint:#C4BFB5;--rule:#E0DDD6;
+  --core:#C23B22;--core-bg:#FBE9E5;--support:#B07B10;--support-bg:#FBF0D8;--enrich:#2E7A4A;--enrich-bg:#E5F3EB;--wallet:#3A5FA8;--wallet-bg:#E5EBF9;
+  --cl-hormonal:#9B3080;--cl-metabolic:#C05020;--cl-nutritional:#6B7A20;--cl-mental:#3060A0;--cl-thyroid:#107070;--cl-gut:#806030;--cl-maternal:#8B3A50;
+  font-family:'DM Sans',system-ui,sans-serif;color:#1C1A16;font-size:13px;line-height:1.55;-webkit-font-smoothing:antialiased;
+}
+#view-map .page{max-width:1100px;margin:0 auto;padding:0 28px 100px}
+#view-map .topbar{display:flex;align-items:center;justify-content:space-between;padding:20px 0 16px;border-bottom:1px solid var(--rule);margin-bottom:32px;flex-wrap:wrap;gap:10px}
+#view-map .brand{display:flex;align-items:center;gap:10px}
+#view-map .brand-mark{font-family:'DM Mono',monospace;font-size:11px;font-weight:500;padding:4px 8px;border:1px solid var(--ink);border-radius:2px;letter-spacing:.04em}
+#view-map .brand-name{font-family:'Libre Baskerville',Georgia,serif;font-size:15px}
+#view-map .topbar-right{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+#view-map .filter-btn{padding:5px 12px;border-radius:2px;border:1px solid var(--rule);background:transparent;color:var(--muted);font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
+#view-map .filter-btn:hover,#view-map .filter-btn.active{border-color:var(--ink);color:var(--ink);background:var(--paper)}
+#view-map .print-btn{padding:6px 14px;border-radius:2px;border:1px solid var(--ink);background:var(--ink);color:var(--bg);font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif}
+#view-map .hero{margin-bottom:36px}
+#view-map .hero-eyebrow{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:.07em;text-transform:uppercase;margin-bottom:10px}
+#view-map .hero h1{font-family:'Libre Baskerville',Georgia,serif;font-size:42px;font-weight:700;line-height:1.04;letter-spacing:-.02em;margin-bottom:14px}
+#view-map .hero h1 em{font-style:italic;font-weight:400;color:var(--muted)}
+#view-map .hero-sub{font-size:14px;color:var(--muted);max-width:640px;line-height:1.7}
+#view-map .hero-legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:18px;padding:14px 16px;background:var(--paper);border:1px solid var(--rule);border-radius:2px}
+#view-map .hl-item{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--muted)}
+#view-map .hl-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+#view-map .hl-sep{width:1px;height:16px;background:var(--rule)}
+#view-map .field-index{background:var(--paper);border:1px solid var(--rule);border-radius:2px;padding:16px 20px;margin-bottom:36px}
+#view-map .fi-title{font-family:'DM Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:12px}
+#view-map .fi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px}
+#view-map .fi-item{display:flex;align-items:flex-start;gap:8px;padding:7px 9px;border-radius:2px;border:1px solid var(--rule);background:var(--bg)}
+#view-map .fi-num{font-family:'DM Mono',monospace;font-size:10px;color:var(--faint);min-width:20px;flex-shrink:0;margin-top:1px}
+#view-map .fi-name{font-size:12px;font-weight:500;color:var(--ink)}
+#view-map .fi-desc{font-size:10.5px;color:var(--muted);margin-top:1px;line-height:1.4}
+#view-map .fi-status{font-size:9px;padding:2px 6px;border-radius:2px;font-weight:500;font-family:'DM Mono',monospace;margin-top:3px;display:inline-block}
+#view-map .fs-live{background:#E5F3EB;color:var(--enrich)}
+#view-map .fs-add{background:#FBF0D8;color:var(--support)}
+#view-map .fs-zero{background:#FBE9E5;color:var(--core)}
+#view-map .cluster{margin-bottom:48px}
+#view-map .cluster-header{display:flex;align-items:center;gap:14px;margin-bottom:20px;padding-bottom:12px;border-bottom:2px solid var(--rule)}
+#view-map .cluster-stripe{width:4px;height:44px;border-radius:2px;flex-shrink:0}
+#view-map .cluster-titles h2{font-family:'Libre Baskerville',Georgia,serif;font-size:26px;font-weight:700;line-height:1.1}
+#view-map .cluster-titles p{font-size:12px;color:var(--muted);margin-top:3px}
+#view-map .cluster-count{font-family:'DM Mono',monospace;font-size:11px;color:var(--faint);margin-left:auto}
+#view-map .disease-grid{display:grid;gap:14px}
+#view-map .disease-card{background:var(--paper);border:1px solid var(--rule);border-radius:2px;overflow:hidden}
+#view-map .dc-header{display:flex;align-items:flex-start;gap:0;cursor:pointer;padding:14px 18px;transition:background .12s}
+#view-map .dc-header:hover{background:var(--bg)}
+#view-map .dc-left{flex:1;min-width:0}
+#view-map .dc-eyebrow{font-family:'DM Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.06em;color:var(--faint);margin-bottom:4px}
+#view-map .dc-name{font-family:'Libre Baskerville',Georgia,serif;font-size:18px;font-weight:700;line-height:1.1;margin-bottom:5px}
+#view-map .dc-meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+#view-map .dc-meta-pill{font-size:10px;padding:2px 8px;border-radius:2px;font-weight:500}
+#view-map .dc-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;margin-left:16px;flex-shrink:0}
+#view-map .sc-bar{width:80px;height:4px;border-radius:2px;background:var(--rule);overflow:hidden;margin-bottom:3px}
+#view-map .sc-fill{height:100%;border-radius:2px}
+#view-map .sc-label{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);text-align:right}
+#view-map .dc-toggle{color:var(--faint);font-size:18px;line-height:1;margin-top:4px}
+#view-map .dc-body{display:none;border-top:1px solid var(--rule);padding:16px 18px}
+#view-map .dc-body.open{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media(max-width:700px){#view-map .dc-body.open{grid-template-columns:1fr}}
+#view-map .db-section-title{font-family:'DM Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.07em;color:var(--faint);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+#view-map .db-section-title::after{content:'';flex:1;height:1px;background:var(--rule)}
+#view-map .pop-block{background:var(--bg);border:1px solid var(--rule);border-radius:2px;padding:10px 12px;margin-bottom:14px}
+#view-map .pop-row{display:flex;justify-content:space-between;align-items:baseline;padding:3px 0;border-bottom:1px solid var(--rule);font-size:11.5px;gap:8px}
+#view-map .pop-row:last-child{border-bottom:none}
+#view-map .pop-key{color:var(--muted);flex-shrink:0}
+#view-map .pop-val{font-weight:500;color:var(--ink);text-align:right}
+#view-map .pop-source{font-size:9px;color:var(--faint);font-family:'DM Mono',monospace;font-weight:400}
+#view-map .signal-fields{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+#view-map .sf-item{display:flex;align-items:flex-start;gap:8px;padding:7px 10px;border-radius:2px;border-left:3px solid}
+#view-map .sf-strength{font-family:'DM Mono',monospace;font-size:9px;font-weight:500;min-width:52px;flex-shrink:0;padding-top:1px;text-transform:uppercase;letter-spacing:.03em}
+#view-map .sf-num{font-family:'DM Mono',monospace;font-size:9px;color:var(--faint);min-width:16px;flex-shrink:0;padding-top:1px}
+#view-map .sf-field{font-size:12px;font-weight:500;color:var(--ink)}
+#view-map .sf-why{font-size:10.5px;color:var(--muted);margin-top:1px;line-height:1.45}
+#view-map .sf-item.core{border-color:var(--core);background:var(--core-bg)}
+#view-map .sf-item.support{border-color:var(--support);background:var(--support-bg)}
+#view-map .sf-item.enrich{border-color:var(--enrich);background:var(--enrich-bg)}
+#view-map .sf-item.wallet{border-color:var(--wallet);background:var(--wallet-bg)}
+#view-map .el-spec{border:1px dashed var(--core);border-radius:2px;padding:10px 12px;margin-bottom:14px;background:var(--core-bg)}
+#view-map .el-spec-title{font-size:10px;font-weight:600;color:var(--core);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em;font-family:'DM Mono',monospace}
+#view-map .el-spec-item{font-size:11.5px;color:var(--ink);padding:3px 0;border-bottom:1px solid rgba(194,59,34,.12);line-height:1.5}
+#view-map .el-spec-item:last-child{border-bottom:none}
+#view-map .marginal-note{background:var(--bg);border:1px solid var(--rule);border-left:3px solid var(--ink);padding:9px 11px;border-radius:0 2px 2px 0;font-size:11.5px;color:var(--muted);line-height:1.55;margin-bottom:10px}
+#view-map .marginal-note strong{color:var(--ink);font-weight:500}
+#view-map .marginal-table-wrap{margin-top:48px;border-top:2px solid var(--ink);padding-top:28px}
+#view-map .mt-title{font-family:'Libre Baskerville',Georgia,serif;font-size:28px;font-weight:700;margin-bottom:6px}
+#view-map .mt-sub{font-size:13px;color:var(--muted);line-height:1.65;max-width:700px;margin-bottom:20px}
+#view-map .marginal-table{width:100%;border-collapse:collapse;font-size:12px;background:var(--paper)}
+#view-map .marginal-table th{text-align:left;padding:9px 12px;background:var(--ink);color:var(--bg);font-size:10px;text-transform:uppercase;letter-spacing:.04em;font-family:'DM Mono',monospace;font-weight:500}
+#view-map .marginal-table td{padding:9px 12px;border-bottom:1px solid var(--rule);vertical-align:top}
+#view-map .marginal-table tr:hover td{background:var(--bg)}
+#view-map .mt-field-name{font-weight:500;color:var(--ink);margin-bottom:2px}
+#view-map .mt-field-sub{font-size:10.5px;color:var(--muted)}
+#view-map .mt-friction{display:flex;gap:2px;margin-bottom:3px}
+#view-map .friction-dot{width:8px;height:8px;border-radius:50%}
+#view-map .fd-fill{background:var(--ink)}
+#view-map .fd-empty{background:var(--rule)}
+#view-map .mt-diseases{display:flex;gap:4px;flex-wrap:wrap}
+#view-map .mt-d-tag{font-size:9.5px;padding:2px 6px;border-radius:2px;font-weight:500}
+#view-map .mt-priority{font-family:'DM Mono',monospace;font-size:10px;font-weight:500;padding:3px 8px;border-radius:2px;white-space:nowrap}
+#view-map .pr-high{background:var(--core-bg);color:var(--core)}
+#view-map .pr-med{background:var(--support-bg);color:var(--support)}
+#view-map .pr-low{background:var(--enrich-bg);color:var(--enrich)}
+#view-map .pr-clinical{background:var(--wallet-bg);color:var(--wallet)}
+#view-map .appendix{margin-top:48px;border-top:1px dashed var(--rule);padding-top:28px;opacity:.7}
+#view-map .appendix h2{font-family:'Libre Baskerville',Georgia,serif;font-size:22px;font-weight:700;margin-bottom:8px}
+#view-map .appendix-note{font-size:12.5px;color:var(--muted);max-width:680px;line-height:1.65;margin-bottom:20px}
+#view-map .appendix-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px}
+#view-map .app-card{background:var(--paper);border:1px solid var(--rule);border-radius:2px;padding:12px 14px}
+#view-map .app-name{font-family:'Libre Baskerville',Georgia,serif;font-size:15px;font-weight:700;margin-bottom:4px}
+#view-map .app-icd{font-family:'DM Mono',monospace;font-size:9px;color:var(--faint);margin-bottom:6px}
+#view-map .app-reason{font-size:11.5px;color:var(--muted);line-height:1.5;margin-bottom:6px}
+#view-map .app-fields{font-size:11px;color:var(--ink)}
+#view-map .doc-footer{margin-top:48px;padding-top:16px;border-top:1px solid var(--rule);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;font-size:11px;color:var(--faint)}
+/* Explorer deep-link prompt in map topbar */
+#view-map .explore-btn{padding:6px 12px;border-radius:2px;border:1px solid #1E2D44;background:#111720;color:#F5E070;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:6px;transition:background .15s}
+#view-map .explore-btn:hover{background:#1A2438}
+
+/* ══════════════════════════════════════════════════
+   EXPLORER STYLES (dark theme)
+══════════════════════════════════════════════════ */
+#view-explorer{
+  position:fixed;top:44px;left:0;right:0;bottom:0;
+  background:#0A0E14;
+  --bg-x:#0A0E14;
+  --s1:#0F1520;--s2:#141D2E;--s3:#1A2438;
+  --border:#1E2D44;--border2:#263652;
+  --ink-x:#EEE8DC;--muted-x:#6A7A90;--faint-x:#2A3A52;
+  --signal:#F5E070;--signal2:#F0C020;--signal-dim:#3A3000;
+  font-family:'Inter',system-ui,sans-serif;
+  color:#EEE8DC;font-size:13px;line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+#view-explorer .app{display:flex;height:100%;overflow:hidden}
+#view-explorer .sidebar{width:256px;flex-shrink:0;background:var(--s1);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+#view-explorer .main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+#view-explorer .detail{width:320px;flex-shrink:0;background:var(--s1);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+#view-explorer .sb-top{padding:16px 16px 10px;border-bottom:1px solid var(--border)}
+#view-explorer .sb-brand{display:flex;align-items:center;gap:8px;margin-bottom:2px}
+#view-explorer .sb-gem{width:20px;height:20px;border-radius:4px;background:var(--signal);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#000;font-family:'Syne',sans-serif}
+#view-explorer .sb-name{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:#EEE8DC}
+#view-explorer .sb-tagline{font-size:10px;color:#6A7A90}
+#view-explorer .sb-section{padding:10px 16px 4px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#2A3A52}
+#view-explorer .stream-list{overflow-y:auto;flex:1}
+#view-explorer .stream-item{display:flex;align-items:center;gap:10px;padding:9px 16px;cursor:pointer;border-bottom:1px solid var(--border);transition:background .12s;user-select:none}
+#view-explorer .stream-item:hover{background:var(--s2)}
+#view-explorer .si-toggle{width:18px;height:18px;border-radius:4px;border:1.5px solid;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
+#view-explorer .si-toggle.on{border-color:transparent}
+#view-explorer .si-toggle.on::after{content:'✓';font-size:11px;font-weight:700;color:#000}
+#view-explorer .si-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+#view-explorer .si-info{flex:1;min-width:0}
+#view-explorer .si-name{font-size:12px;font-weight:500;color:#EEE8DC}
+#view-explorer .si-theme{font-size:10px;color:#6A7A90;margin-top:1px}
+#view-explorer .si-live{font-size:9px;padding:2px 6px;border-radius:3px;background:#0A2010;color:#40B060;font-weight:500;font-family:'JetBrains Mono',monospace;flex-shrink:0}
+#view-explorer .sb-bottom{padding:10px 16px;border-top:1px solid var(--border)}
+#view-explorer .sb-reset{width:100%;padding:7px;background:var(--s2);border:1px solid var(--border2);border-radius:4px;color:#6A7A90;font-size:11px;cursor:pointer;font-family:'Inter',sans-serif;transition:all .15s}
+#view-explorer .sb-reset:hover{border-color:var(--signal);color:var(--signal)}
+#view-explorer .sb-count{font-size:10px;color:#6A7A90;text-align:center;margin-top:6px}
+#view-explorer .main-header{padding:14px 20px;border-bottom:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:space-between}
+#view-explorer .mh-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;color:#EEE8DC}
+#view-explorer .mh-sub{font-size:11px;color:#6A7A90;margin-top:2px}
+#view-explorer .tab-bar{display:flex;gap:0;border-bottom:1px solid var(--border);flex-shrink:0}
+#view-explorer .tab{padding:10px 20px;font-size:12px;font-weight:500;color:#6A7A90;cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;background:none;border-top:none;border-left:none;border-right:none;font-family:'Inter',sans-serif}
+#view-explorer .tab:hover{color:#EEE8DC}
+#view-explorer .tab.active{color:var(--signal);border-bottom-color:var(--signal)}
+#view-explorer .main-body{flex:1;overflow:hidden;position:relative}
+#view-explorer #graphView{width:100%;height:100%;position:relative}
+#view-explorer .graph-svg{width:100%;height:100%}
+#view-explorer #signalView{display:none;padding:20px;overflow-y:auto;height:100%}
+#view-explorer .signal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+#view-explorer .signal-card{background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:14px 16px;cursor:pointer;transition:all .2s}
+#view-explorer .signal-card:hover{border-color:var(--border2)}
+#view-explorer .signal-card.strong{border-color:var(--signal);background:var(--s2)}
+#view-explorer .signal-card.medium{border-color:#F0A030;opacity:.9}
+#view-explorer .signal-card.weak{opacity:.6}
+#view-explorer .sc-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+#view-explorer .sc-name{font-family:'Syne',sans-serif;font-size:15px;font-weight:600;color:#EEE8DC}
+#view-explorer .sc-conf{font-family:'JetBrains Mono',monospace;font-size:11px;padding:3px 8px;border-radius:3px;font-weight:500}
+#view-explorer .sc-streams{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px}
+#view-explorer .sc-stream-tag{font-size:10px;padding:2px 7px;border-radius:3px;font-weight:500}
+#view-explorer .sc-missing{font-size:10px;color:#6A7A90;line-height:1.5;margin-bottom:6px}
+#view-explorer .sc-bar{height:4px;border-radius:2px;background:#2A3A52;overflow:hidden;margin-bottom:6px}
+#view-explorer .sc-bar-fill{height:100%;border-radius:2px;transition:width .5s ease}
+#view-explorer .sc-icd{font-family:'JetBrains Mono',monospace;font-size:9px;color:#6A7A90}
+#view-explorer .sc-pharma{font-size:10.5px;color:#6A7A90;margin-top:5px;line-height:1.45;border-top:1px solid var(--border);padding-top:6px}
+#view-explorer #diseaseView{display:none;padding:20px;overflow-y:auto;height:100%}
+#view-explorer .disease-list{display:flex;flex-direction:column;gap:10px}
+#view-explorer .disease-row{background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:14px 16px;cursor:pointer;transition:border-color .15s}
+#view-explorer .disease-row:hover{border-color:var(--border2)}
+#view-explorer .disease-row.selected{border-color:var(--signal)}
+#view-explorer .dr-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+#view-explorer .dr-name{font-family:'Syne',sans-serif;font-size:14px;font-weight:600}
+#view-explorer .dr-icd{font-family:'JetBrains Mono',monospace;font-size:10px;color:#6A7A90}
+#view-explorer .dr-streams{display:flex;gap:5px;flex-wrap:wrap}
+#view-explorer .dr-stream{font-size:10px;padding:2px 8px;border-radius:3px;font-weight:500;display:flex;align-items:center;gap:4px}
+#view-explorer .dr-stream-live::before{content:'●';font-size:8px}
+#view-explorer .dr-stream-missing::before{content:'○';font-size:8px;opacity:.5}
+#view-explorer .detail-header{padding:14px 18px 10px;border-bottom:1px solid var(--border);flex-shrink:0}
+#view-explorer .dh-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#6A7A90}
+#view-explorer .dh-title{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;margin-top:4px;color:#EEE8DC}
+#view-explorer .detail-body{overflow-y:auto;flex:1;padding:14px 18px}
+#view-explorer .det-section{margin-bottom:16px}
+#view-explorer .det-sec-title{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#6A7A90;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+#view-explorer .det-sec-title::after{content:'';flex:1;height:1px;background:var(--border)}
+#view-explorer .conf-meter{margin-bottom:12px}
+#view-explorer .cm-label{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px}
+#view-explorer .cm-name{font-size:12px;font-weight:500;color:#EEE8DC}
+#view-explorer .cm-val{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:500}
+#view-explorer .cm-bar{height:6px;border-radius:3px;background:#2A3A52;overflow:hidden}
+#view-explorer .cm-fill{height:100%;border-radius:3px;transition:width .5s ease}
+#view-explorer .stream-contrib{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+#view-explorer .sc-contrib-row{display:flex;align-items:center;gap:8px;padding:6px 9px;border-radius:5px;border:1px solid var(--border)}
+#view-explorer .scr-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+#view-explorer .scr-name{font-size:11.5px;font-weight:500;flex:1}
+#view-explorer .scr-weight{font-family:'JetBrains Mono',monospace;font-size:10px;color:#6A7A90}
+#view-explorer .scr-active{background:var(--s2)}
+#view-explorer .scr-inactive{opacity:.4}
+#view-explorer .missing-box{background:var(--signal-dim);border:1px solid var(--signal2);border-radius:5px;padding:10px 12px;margin-bottom:12px}
+#view-explorer .mb-title{font-size:10px;font-weight:600;color:var(--signal);margin-bottom:5px}
+#view-explorer .mb-body{font-size:11.5px;color:#C8B030;line-height:1.55}
+#view-explorer .pharma-box{background:var(--s3);border:1px solid var(--border2);border-radius:5px;padding:10px 12px;margin-bottom:12px}
+#view-explorer .pb-title{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#6A7A90;margin-bottom:6px}
+#view-explorer .pb-body{font-size:11.5px;color:#EEE8DC;line-height:1.6}
+#view-explorer .mechanism-box{font-size:11.5px;color:#6A7A90;line-height:1.65;border-left:2px solid var(--border2);padding-left:10px;margin-bottom:12px}
+#view-explorer .empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center;padding:24px;color:#6A7A90}
+#view-explorer .es-icon{font-size:36px;margin-bottom:12px;opacity:.4}
+#view-explorer .es-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:600;color:#EEE8DC;margin-bottom:6px}
+#view-explorer .es-body{font-size:12px;line-height:1.6}
+/* Map-to-explorer deep link banner in explorer */
+#view-explorer .map-link-bar{padding:8px 20px;background:#0D1522;border-bottom:1px solid var(--border);font-size:11px;color:#3A4A60;display:flex;align-items:center;gap:8px;flex-shrink:0}
+#view-explorer .map-link-bar a{color:#5A7A90;cursor:pointer;text-decoration:none}
+#view-explorer .map-link-bar a:hover{color:var(--signal)}
+
+@media print{
+  #suite-nav{display:none}
+  #view-explorer{display:none!important}
+  #view-map{display:block!important;padding-top:0}
+  #view-map .dc-body{display:grid!important;grid-template-columns:1fr 1fr;gap:14px}
+  #view-map .topbar-right{display:none}
+}
+</style>
+</head>
+<body style="margin:0;padding:0;background:#111720">
+
+<!-- ══════════════════════════════════════
+  UNIFIED TOP NAVIGATION
+══════════════════════════════════════ -->
+<nav id="suite-nav">
+  <div class="sn-brand">
+    <div class="sn-gem">H</div>
+    <span class="sn-name">Halla Health</span>
+  </div>
+  <div class="sn-divider"></div>
+  <div class="sn-tabs">
+    <button class="sn-tab active" id="nav-map" onclick="switchView('map')">
+      <span class="sn-tab-dot"></span>
+      Disease Signal Map
+    </button>
+    <button class="sn-tab" id="nav-explorer" onclick="switchView('explorer')">
+      <span class="sn-tab-dot"></span>
+      Signal Explorer
+      <span class="sn-tab-badge">INTERACTIVE</span>
+    </button>
+  </div>
+  <div class="sn-right">
+    <span class="sn-link" id="nav-context-hint" style="font-size:10px">Clinical reference + cross-domain explorer</span>
+    <span class="sn-link" onclick="window.print()" title="Print Signal Map">⎙ Print map</span>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════
+  VIEW A: DISEASE SIGNAL MAP
+══════════════════════════════════════ -->
+<div id="view-map">
+<div class="page">
+<div class="topbar">
+  <div class="brand"><span class="brand-mark">HH</span><span class="brand-name">Halla Health</span></div>
+  <div class="topbar-right">
+    <button class="filter-btn active" onclick="mapFilterCluster('all',this)">All</button>
+    <button class="filter-btn" onclick="mapFilterCluster('hormonal',this)" style="border-color:#9B3080;color:#9B3080">Hormonal</button>
+    <button class="filter-btn" onclick="mapFilterCluster('metabolic',this)" style="border-color:#C05020;color:#C05020">Metabolic</button>
+    <button class="filter-btn" onclick="mapFilterCluster('nutritional',this)" style="border-color:#6B7A20;color:#6B7A20">Nutritional</button>
+    <button class="filter-btn" onclick="mapFilterCluster('mental',this)" style="border-color:#3060A0;color:#3060A0">Mental health</button>
+    <button class="filter-btn" onclick="mapFilterCluster('thyroid',this)" style="border-color:#107070;color:#107070">Thyroid</button>
+    <button class="filter-btn" onclick="mapFilterCluster('maternal',this)" style="border-color:#8B3A50;color:#8B3A50">Maternal</button>
+    <button class="filter-btn" onclick="mapFilterCluster('gut',this)" style="border-color:#806030;color:#806030">Gut</button>
+    <button class="explore-btn" onclick="switchView('explorer')" title="Open interactive cross-domain explorer">
+      ◎ Explore signals
+    </button>
+    <button class="print-btn" onclick="window.print()">Print</button>
+  </div>
+</div>
+<div class="hero">
+  <div class="hero-eyebrow">Disease signal map · data field reference · June 2026</div>
+  <h1>Which diseases can Halla Health<br>data help <em>signal?</em></h1>
+  <p class="hero-sub">For each condition, this shows which data fields generate the signal, at what strength, and what the population burden looks like in Halla Health's primary markets — India, Uganda, and East Africa. Prevalence figures are sourced from peer-reviewed literature and official surveys.</p>
+  <div class="hero-legend">
+    <span style="font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em">Signal strength:</span>
+    <div class="hl-item"><div class="hl-dot" style="background:var(--core)"></div><strong style="color:var(--ink)">Core</strong> — anchor field, signal inactive without it</div>
+    <div class="hl-item"><div class="hl-dot" style="background:var(--support)"></div><strong style="color:var(--ink)">Supporting</strong> — meaningfully strengthens signal</div>
+    <div class="hl-item"><div class="hl-dot" style="background:var(--enrich)"></div><strong style="color:var(--ink)">Enriching</strong> — adds context and confidence</div>
+    <div class="hl-item"><div class="hl-dot" style="background:var(--wallet)"></div><strong style="color:var(--ink)">Health wallet</strong> — clinical record that confirms</div>
+    <div class="hl-sep"></div>
+    <div class="hl-item" style="font-size:11px">Click any condition to expand</div>
+  </div>
+</div>
+<div class="field-index">
+  <div class="fi-title">Data fields referenced in this document</div>
+  <div class="fi-grid">
+    <div class="fi-item"><div class="fi-num">F1</div><div><div class="fi-name">Emotional labelling</div><div class="fi-desc">Mood, valence, energy — currently zero depth, spec below</div><span class="fi-status fs-zero">Needs full build</span></div></div>
+    <div class="fi-item"><div class="fi-num">F2</div><div><div class="fi-name">Menstrual cycle</div><div class="fi-desc">Cycle start/end, flow volume, menstrual pain score</div><span class="fi-status fs-add">Proposed addition</span></div></div>
+    <div class="fi-item"><div class="fi-num">F3</div><div><div class="fi-name">Sleep quality</div><div class="fi-desc">Duration, quality rating, wake events, morning waking</div><span class="fi-status fs-add">Proposed addition</span></div></div>
+    <div class="fi-item"><div class="fi-num">F4</div><div><div class="fi-name">Fatigue &amp; energy</div><div class="fi-desc">Severity 0–10, time-of-day pattern, exertional vs constant</div><span class="fi-status fs-add">Proposed addition</span></div></div>
+    <div class="fi-item"><div class="fi-num">F5</div><div><div class="fi-name">Nutrition &amp; diet</div><div class="fi-desc">Meal groups, iron-rich food frequency, dietary adequacy</div><span class="fi-status fs-add">Proposed addition</span></div></div>
+    <div class="fi-item"><div class="fi-num">F6</div><div><div class="fi-name">Skin condition</div><div class="fi-desc">Weekly: clear / mild breakout / significant / dry-rough</div><span class="fi-status fs-add">Proposed addition</span></div></div>
+    <div class="fi-item"><div class="fi-num">F7</div><div><div class="fi-name">GI &amp; gut symptoms</div><div class="fi-desc">Bloating, bowel habit, abdominal pain, nausea</div><span class="fi-status fs-add">Proposed addition</span></div></div>
+    <div class="fi-item"><div class="fi-num">F8</div><div><div class="fi-name">Physical activity</div><div class="fi-desc">Exercise session or steps, intensity, duration</div><span class="fi-status fs-add">Proposed addition</span></div></div>
+    <div class="fi-item"><div class="fi-num">F9</div><div><div class="fi-name">Body weight</div><div class="fi-desc">Self-reported weight; trend over time</div><span class="fi-status fs-add">Proposed addition</span></div></div>
+    <div class="fi-item"><div class="fi-num">F10</div><div><div class="fi-name">Pain &amp; symptoms</div><div class="fi-desc">Location, NRS 0–10, character, duration</div><span class="fi-status fs-add">Proposed addition</span></div></div>
+    <div class="fi-item"><div class="fi-num">F11</div><div><div class="fi-name">Blood sugar</div><div class="fi-desc">Fasting and post-meal glucose readings</div><span class="fi-status fs-add">Proposed addition</span></div></div>
+    <div class="fi-item"><div class="fi-num">F12</div><div><div class="fi-name">Blood pressure</div><div class="fi-desc">Systolic / diastolic — self-measured BP cuff</div><span class="fi-status fs-add">Proposed addition</span></div></div>
+    <div class="fi-item"><div class="fi-num">F13</div><div><div class="fi-name">Stress &amp; life events</div><div class="fi-desc">Perceived stress scale, life event log</div><span class="fi-status fs-add">Proposed addition</span></div></div>
+    <div class="fi-item"><div class="fi-num">F14</div><div><div class="fi-name">Pregnancy status</div><div class="fi-desc">Gestational week, antenatal visit, symptoms</div><span class="fi-status fs-add">Proposed addition</span></div></div>
+    <div class="fi-item"><div class="fi-num">F15</div><div><div class="fi-name">Medication record</div><div class="fi-desc">Current medications, adherence, prescribed for</div><span class="fi-status fs-live">Live (reminders)</span></div></div>
+    <div class="fi-item"><div class="fi-num">HW</div><div><div class="fi-name">Health wallet records</div><div class="fi-desc">Clinical uploads: blood tests, imaging, prescriptions</div><span class="fi-status fs-add">Planned feature</span></div></div>
+  </div>
+</div>
+<!-- CLUSTER 1: HORMONAL -->
+<div class="cluster" data-cluster="hormonal">
+  <div class="cluster-header">
+    <div class="cluster-stripe" style="background:var(--cl-hormonal)"></div>
+    <div class="cluster-titles"><h2 style="color:var(--cl-hormonal)">Hormonal &amp; reproductive</h2><p>Conditions driven by hormonal dysregulation, ovarian function, and uterine health</p></div>
+    <span class="cluster-count">4 conditions</span>
+  </div>
+  <div class="disease-grid">
+
+    <!-- PCOS -->
+    <div class="disease-card">
+      <div class="dc-header" onclick="mapToggle(this)">
+        <div class="dc-left">
+          <div class="dc-eyebrow">Hormonal · F2 F1 F6 F9 F4 F8</div>
+          <div class="dc-name">Polycystic Ovary Syndrome (PCOS)</div>
+          <div class="dc-meta">
+            <span class="dc-meta-pill" style="background:#F5EAF8;color:var(--cl-hormonal)">Women of reproductive age · 15–45</span>
+            <span class="dc-meta-pill" style="background:var(--support-bg);color:var(--support)">Strong app signal</span>
+          </div>
+        </div>
+        <div class="dc-right">
+          <div><div class="sc-bar"><div class="sc-fill" style="width:82%;background:var(--cl-hormonal)"></div></div><div class="sc-label">Signal potential: 82%</div></div>
+          <div class="dc-toggle">▾</div>
+        </div>
+      </div>
+      <div class="dc-body">
+        <div>
+          <div class="db-section-title">Population — India · Uganda · East Africa</div>
+          <div class="pop-block">
+            <div class="pop-row"><span class="pop-key">India prevalence</span><span class="pop-val">19.6% by Rotterdam criteria (≈44M women) <span class="pop-source">ICMR Task Force, JAMA Netw Open 2024</span></span></div>
+            <div class="pop-row"><span class="pop-key">Age of onset</span><span class="pop-val">Typically 15–25; peak diagnosis 20–35</span></div>
+            <div class="pop-row"><span class="pop-key">Uganda / East Africa</span><span class="pop-val">Estimated 8–13% (WHO global estimate); limited local studies</span></div>
+            <div class="pop-row"><span class="pop-key">Undiagnosed fraction</span><span class="pop-val">Up to 70% undiagnosed globally; higher in LMICs <span class="pop-source">Bozdag et al., Hum Reprod 2016</span></span></div>
+            <div class="pop-row"><span class="pop-key">User group</span><span class="pop-val">Adolescent girls + women of reproductive age (12–45)</span></div>
+          </div>
+          <div class="db-section-title">Emotional labelling — recommended spec (starting from zero)</div>
+          <div class="el-spec">
+            <div class="el-spec-title">Minimum fields needed from F1</div>
+            <div class="el-spec-item"><strong>Mood valence score</strong> — 1–5 daily. PCOS drives cyclical mood swings; pattern only detectable with daily timestamped scoring</div>
+            <div class="el-spec-item"><strong>Irritability flag</strong> — yes/no daily. Androgen-driven irritability is distinct from sadness and needs separate capture</div>
+            <div class="el-spec-item"><strong>Energy level</strong> — 1–5 daily. Insulin resistance in PCOS causes characteristic post-meal energy crashes</div>
+            <div class="el-spec-item"><strong>Timestamp</strong> — time of day. Cortisol rhythm disruption in PCOS shows morning-specific low energy pattern</div>
+          </div>
+          <div class="marginal-note"><strong>Marginal gain:</strong> F2 (cycle dates) alone creates a PCOS signal candidate. F1 (to spec) + F2 + F6 (skin) together raise confidence to ~82% — covering the three most common presenting features: irregular cycles, mood dysregulation, and androgen-driven acne.</div>
+        </div>
+        <div>
+          <div class="db-section-title">Data fields → signal strength</div>
+          <div class="signal-fields">
+            <div class="sf-item core"><span class="sf-strength" style="color:var(--core)">Core</span><span class="sf-num">F2</span><div><div class="sf-field">Menstrual cycle dates + regularity</div><div class="sf-why">Irregular cycles (&gt;35 days or &lt;3 periods/year) are the primary PCOS diagnostic criterion. Without this, the signal cannot be established.</div></div></div>
+            <div class="sf-item support"><span class="sf-strength" style="color:var(--support)">Support</span><span class="sf-num">F6</span><div><div class="sf-field">Skin condition rating (acne)</div><div class="sf-why">Androgen-driven acne present in 70–80% of PCOS cases. Weekly skin rating creates a secondary confirming signal.</div></div></div>
+            <div class="sf-item support"><span class="sf-strength" style="color:var(--support)">Support</span><span class="sf-num">F9</span><div><div class="sf-field">Body weight trend</div><div class="sf-why">43.2% of Indian women with PCOS have obesity (JAMA 2024). Rising weight + irregular cycles strengthens signal significantly.</div></div></div>
+            <div class="sf-item enrich"><span class="sf-strength" style="color:var(--enrich)">Enrich</span><span class="sf-num">F1</span><div><div class="sf-field">Emotional labelling (valence + irritability + energy)</div><div class="sf-why">Mood dysregulation present in most PCOS cases. Cyclical pattern co-moving with cycle irregularity strengthens signal.</div></div></div>
+            <div class="sf-item enrich"><span class="sf-strength" style="color:var(--enrich)">Enrich</span><span class="sf-num">F4</span><div><div class="sf-field">Fatigue — post-meal pattern</div><div class="sf-why">Post-meal fatigue from insulin resistance is characteristic of PCOS. Time-of-day sub-field is key.</div></div></div>
+            <div class="sf-item wallet"><span class="sf-strength" style="color:var(--wallet)">Wallet</span><span class="sf-num">HW</span><div><div class="sf-field">Hormone panel (LH, FSH, testosterone, AMH) or pelvic ultrasound</div><div class="sf-why">Clinical confirmation. Converts probable signal to confirmed PCOS for pharma-grade use.</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Endometriosis -->
+    <div class="disease-card">
+      <div class="dc-header" onclick="mapToggle(this)">
+        <div class="dc-left">
+          <div class="dc-eyebrow">Hormonal · F10 F2 F1 F4 F7</div>
+          <div class="dc-name">Endometriosis</div>
+          <div class="dc-meta">
+            <span class="dc-meta-pill" style="background:#F5EAF8;color:var(--cl-hormonal)">Women of reproductive age · 15–49</span>
+            <span class="dc-meta-pill" style="background:var(--core-bg);color:var(--core)">Requires pain + cycle</span>
+          </div>
+        </div>
+        <div class="dc-right">
+          <div><div class="sc-bar"><div class="sc-fill" style="width:75%;background:var(--cl-hormonal)"></div></div><div class="sc-label">Signal potential: 75%</div></div>
+          <div class="dc-toggle">▾</div>
+        </div>
+      </div>
+      <div class="dc-body">
+        <div>
+          <div class="db-section-title">Population — India · Uganda · East Africa</div>
+          <div class="pop-block">
+            <div class="pop-row"><span class="pop-key">India</span><span class="pop-val">~42 million women affected <span class="pop-source">ICMR-NIRRCH, Am J Reprod Immunol 2022</span></span></div>
+            <div class="pop-row"><span class="pop-key">Telangana study</span><span class="pop-val">2.5% confirmed by laparoscopy in hospital cohort <span class="pop-source">EJMED, Telangana 2023</span></span></div>
+            <div class="pop-row"><span class="pop-key">Age of onset</span><span class="pop-val">Mean symptom onset: 15 years; diagnosis: 22–30 years</span></div>
+            <div class="pop-row"><span class="pop-key">Diagnostic delay</span><span class="pop-val">7–10 year average gap; highest in LMICs</span></div>
+            <div class="pop-row"><span class="pop-key">User group</span><span class="pop-val">Adolescent girls + women of reproductive age</span></div>
+          </div>
+          <div class="db-section-title">Emotional labelling — recommended spec (starting from zero)</div>
+          <div class="el-spec">
+            <div class="el-spec-title">Minimum fields needed from F1</div>
+            <div class="el-spec-item"><strong>Mood valence</strong> — 1–5 daily. Depression and anxiety co-occur in endometriosis at 3–4× background rate</div>
+            <div class="el-spec-item"><strong>Context tag</strong> — physical pain / hormonal / situational / none. Ties emotional state to physical pain episodes</div>
+            <div class="el-spec-item"><strong>Cycle-phase timestamp</strong> — enables cyclical mood pattern detection correlated with menstrual phase</div>
+          </div>
+          <div class="marginal-note"><strong>Marginal gain:</strong> F10 (pain score) + F2 (cycle dates) create the core signal. Adding F7 (GI symptoms) moves confidence from ~50% to ~75%, covering dyschezia which affects 35% of cases.</div>
+        </div>
+        <div>
+          <div class="db-section-title">Data fields → signal strength</div>
+          <div class="signal-fields">
+            <div class="sf-item core"><span class="sf-strength" style="color:var(--core)">Core</span><span class="sf-num">F10</span><div><div class="sf-field">Pain score NRS 0–10 + location + cycle correlation</div><div class="sf-why">Cyclical pelvic pain is the defining symptom. Daily NRS correlated with cycle phase is the primary signal field.</div></div></div>
+            <div class="sf-item core"><span class="sf-strength" style="color:var(--core)">Core</span><span class="sf-num">F2</span><div><div class="sf-field">Menstrual cycle dates + pain score at menstruation</div><div class="sf-why">Dysmenorrhoea severity scored separately from chronic pelvic pain. Cyclical pattern distinguishes endometriosis from IBS or fibromyalgia.</div></div></div>
+            <div class="sf-item support"><span class="sf-strength" style="color:var(--support)">Support</span><span class="sf-num">F7</span><div><div class="sf-field">GI symptoms (dyschezia, bloating)</div><div class="sf-why">Bowel involvement present in 35% of cases. GI symptoms co-moving with cycle phase is a distinctive pattern.</div></div></div>
+            <div class="sf-item support"><span class="sf-strength" style="color:var(--support)">Support</span><span class="sf-num">F4</span><div><div class="sf-field">Fatigue severity</div><div class="sf-why">Systemic fatigue reported in &gt;50% of endometriosis patients; co-moves with pain flares.</div></div></div>
+            <div class="sf-item enrich"><span class="sf-strength" style="color:var(--enrich)">Enrich</span><span class="sf-num">F1</span><div><div class="sf-field">Emotional labelling (mood + context tag)</div><div class="sf-why">Captures psychological burden and distinguishes flare-related mood change from baseline depression.</div></div></div>
+            <div class="sf-item wallet"><span class="sf-strength" style="color:var(--wallet)">Wallet</span><span class="sf-num">HW</span><div><div class="sf-field">Surgical report or imaging (TVUS / MRI)</div><div class="sf-why">Definitive clinical confirmation. Only health wallet record that upgrades signal from probable to confirmed.</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Uterine fibroids -->
+    <div class="disease-card">
+      <div class="dc-header" onclick="mapToggle(this)">
+        <div class="dc-left">
+          <div class="dc-eyebrow">Hormonal · F2 F10 F4 F9</div>
+          <div class="dc-name">Uterine Fibroids</div>
+          <div class="dc-meta">
+            <span class="dc-meta-pill" style="background:#F5EAF8;color:var(--cl-hormonal)">Women of reproductive age · 25–50</span>
+            <span class="dc-meta-pill" style="background:var(--support-bg);color:var(--support)">Moderate app signal</span>
+          </div>
+        </div>
+        <div class="dc-right">
+          <div><div class="sc-bar"><div class="sc-fill" style="width:55%;background:var(--cl-hormonal)"></div></div><div class="sc-label">Signal potential: 55%</div></div>
+          <div class="dc-toggle">▾</div>
+        </div>
+      </div>
+      <div class="dc-body">
+        <div>
+          <div class="db-section-title">Population — India · Uganda · East Africa</div>
+          <div class="pop-block">
+            <div class="pop-row"><span class="pop-key">Uganda (Mbarara hospital)</span><span class="pop-val">28.2% of women at gynaecology clinic <span class="pop-source">East Afr Sci J 2022</span></span></div>
+            <div class="pop-row"><span class="pop-key">Sub-Saharan Africa</span><span class="pop-val">70–80% of Black women harbour fibroids over lifetime <span class="pop-source">Frontiers Pharmacol 2023; Igboeli et al.</span></span></div>
+            <div class="pop-row"><span class="pop-key">India (global burden)</span><span class="pop-val">ASIR 250.93 per 100,000 in 2021; India ~15% of global cases <span class="pop-source">GBD 2021, PMC 2025</span></span></div>
+            <div class="pop-row"><span class="pop-key">Age of peak</span><span class="pop-val">35–49; incidence rises sharply after 30</span></div>
+            <div class="pop-row"><span class="pop-key">User group</span><span class="pop-val">Women of reproductive age, especially 30–50</span></div>
+          </div>
+          <div class="marginal-note"><strong>Marginal gain:</strong> F2 (heavy menstrual bleeding) + F10 (pelvic pressure) creates the signal candidate. App cannot confirm — health wallet imaging is the upgrade path. Symptom signal alone is sufficient for pharma market sizing use case.</div>
+        </div>
+        <div>
+          <div class="db-section-title">Data fields → signal strength</div>
+          <div class="signal-fields">
+            <div class="sf-item core"><span class="sf-strength" style="color:var(--core)">Core</span><span class="sf-num">F2</span><div><div class="sf-field">Menstrual flow volume + bleeding duration</div><div class="sf-why">Heavy menstrual bleeding (&gt;80ml per cycle) is the primary fibroid symptom. Self-report of light / moderate / heavy / flooding is a practical proxy.</div></div></div>
+            <div class="sf-item support"><span class="sf-strength" style="color:var(--support)">Support</span><span class="sf-num">F10</span><div><div class="sf-field">Pelvic pressure / heaviness (non-cyclical)</div><div class="sf-why">Distinguishes fibroid-related constant pressure from endometriosis cyclical pain.</div></div></div>
+            <div class="sf-item enrich"><span class="sf-strength" style="color:var(--enrich)">Enrich</span><span class="sf-num">F4</span><div><div class="sf-field">Fatigue</div><div class="sf-why">Secondary anaemia from chronic blood loss causes fatigue. Co-occurrence with heavy bleeding strengthens signal.</div></div></div>
+            <div class="sf-item wallet"><span class="sf-strength" style="color:var(--wallet)">Wallet</span><span class="sf-num">HW</span><div><div class="sf-field">Pelvic ultrasound report</div><div class="sf-why">Fibroids visible on ultrasound. Prior scan upload confirms size, number, and location.</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PMDD -->
+    <div class="disease-card">
+      <div class="dc-header" onclick="mapToggle(this)">
+        <div class="dc-left">
+          <div class="dc-eyebrow">Hormonal · F1 F2 F3 F13</div>
+          <div class="dc-name">PMDD — Premenstrual Dysphoric Disorder</div>
+          <div class="dc-meta">
+            <span class="dc-meta-pill" style="background:#F5EAF8;color:var(--cl-hormonal)">Women of reproductive age · 18–45</span>
+            <span class="dc-meta-pill" style="background:var(--enrich-bg);color:var(--enrich)">Uniquely detectable by app</span>
+          </div>
+        </div>
+        <div class="dc-right">
+          <div><div class="sc-bar"><div class="sc-fill" style="width:88%;background:var(--cl-hormonal)"></div></div><div class="sc-label">Signal potential: 88%</div></div>
+          <div class="dc-toggle">▾</div>
+        </div>
+      </div>
+      <div class="dc-body">
+        <div>
+          <div class="db-section-title">Population — India · Uganda · East Africa</div>
+          <div class="pop-block">
+            <div class="pop-row"><span class="pop-key">Global prevalence</span><span class="pop-val">3–8% of menstruating women meet DSM-5 PMDD criteria <span class="pop-source">ACOG; Epperson et al., JAMA 2012</span></span></div>
+            <div class="pop-row"><span class="pop-key">India</span><span class="pop-val">5–15% moderate-to-severe PMS/PMDD; under-diagnosed as "normal mood swings" <span class="pop-source">Nisar et al., J Pak Med Assoc 2008</span></span></div>
+            <div class="pop-row"><span class="pop-key">Age of peak</span><span class="pop-val">Late 20s to early 40s; often worsens with age</span></div>
+            <div class="pop-row"><span class="pop-key">User group</span><span class="pop-val">Women of reproductive age (18–45) with regular cycles</span></div>
+          </div>
+          <div class="db-section-title">Emotional labelling — recommended spec (starting from zero)</div>
+          <div class="el-spec">
+            <div class="el-spec-title">PMDD requires the richest emotional labelling spec of any condition</div>
+            <div class="el-spec-item"><strong>Mood valence</strong> — 1–5 daily with timestamp. PMDD pattern: severe low mood 7–10 days pre-menstruation, resolving within 48h of period onset</div>
+            <div class="el-spec-item"><strong>Irritability flag</strong> — yes/no daily. DSM-5 criterion — marked irritability distinct from sadness</div>
+            <div class="el-spec-item"><strong>Anxiety flag</strong> — yes/no daily. Tension and anxiety are core PMDD features distinct from general depression</div>
+            <div class="el-spec-item"><strong>Functional impact</strong> — did symptoms interfere with work/relationships? Severity anchor required for PMDD vs PMS distinction</div>
+          </div>
+          <div class="marginal-note"><strong>Marginal gain:</strong> This is the condition where emotional labelling (built to spec) + cycle dates create a signal that clinical assessment alone cannot replicate — because it requires longitudinal daily data across two consecutive cycles. Signal potential 88% with F1 + F2 alone.</div>
+        </div>
+        <div>
+          <div class="db-section-title">Data fields → signal strength</div>
+          <div class="signal-fields">
+            <div class="sf-item core"><span class="sf-strength" style="color:var(--core)">Core</span><span class="sf-num">F1</span><div><div class="sf-field">Emotional labelling — valence + irritability + anxiety + functional impact, daily timestamped</div><div class="sf-why">PMDD is defined by the cyclical timing of mood symptoms. Daily timestamped data correlated with cycle phase is the only way to detect it.</div></div></div>
+            <div class="sf-item core"><span class="sf-strength" style="color:var(--core)">Core</span><span class="sf-num">F2</span><div><div class="sf-field">Menstrual cycle dates</div><div class="sf-why">Without cycle dates, the cyclical emotional pattern cannot be phase-aligned. Together these two fields are the complete PMDD signal.</div></div></div>
+            <div class="sf-item support"><span class="sf-strength" style="color:var(--support)">Support</span><span class="sf-num">F3</span><div><div class="sf-field">Sleep quality</div><div class="sf-why">Insomnia is a PMDD criterion. Sleep disruption co-moving with luteal phase strengthens the signal.</div></div></div>
+            <div class="sf-item enrich"><span class="sf-strength" style="color:var(--enrich)">Enrich</span><span class="sf-num">F13</span><div><div class="sf-field">Stress context</div><div class="sf-why">Distinguishes stress-driven mood change from hormonally-driven PMDD pattern.</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+<!-- CLUSTER 2: METABOLIC -->
+<div class="cluster" data-cluster="metabolic">
+  <div class="cluster-header">
+    <div class="cluster-stripe" style="background:var(--cl-metabolic)"></div>
+    <div class="cluster-titles"><h2 style="color:var(--cl-metabolic)">Metabolic</h2><p>Diabetes, hypertension, obesity — highest commercial pharma interest in Halla Health's markets</p></div>
+    <span class="cluster-count">3 conditions</span>
+  </div>
+  <div class="disease-grid">
+
+    <!-- GDM -->
+    <div class="disease-card">
+      <div class="dc-header" onclick="mapToggle(this)">
+        <div class="dc-left">
+          <div class="dc-eyebrow">Metabolic · F11 F14 F5 F9 F4</div>
+          <div class="dc-name">Gestational Diabetes Mellitus (GDM)</div>
+          <div class="dc-meta">
+            <span class="dc-meta-pill" style="background:#FBF0E8;color:var(--cl-metabolic)">Pregnant women · 20–45</span>
+            <span class="dc-meta-pill" style="background:var(--enrich-bg);color:var(--enrich)">Commercially immediate</span>
+          </div>
+        </div>
+        <div class="dc-right">
+          <div><div class="sc-bar"><div class="sc-fill" style="width:92%;background:var(--cl-metabolic)"></div></div><div class="sc-label">Signal potential: 92%</div></div>
+          <div class="dc-toggle">▾</div>
+        </div>
+      </div>
+      <div class="dc-body">
+        <div>
+          <div class="db-section-title">Population — India · Uganda · East Africa</div>
+          <div class="pop-block">
+            <div class="pop-row"><span class="pop-key">Uganda (Mbarara ANC)</span><span class="pop-val">10.2% of pregnant women <span class="pop-source">Pan Afr Med J 2023; Kahimakazi et al.</span></span></div>
+            <div class="pop-row"><span class="pop-key">India (NFHS-5)</span><span class="pop-val">0.8% self-reported nationally; 10–15% in high-risk clinical groups <span class="pop-source">BMC Women's Health 2024</span></span></div>
+            <div class="pop-row"><span class="pop-key">Age of peak risk</span><span class="pop-val">35–44 highest; rising in younger women with obesity</span></div>
+            <div class="pop-row"><span class="pop-key">User group</span><span class="pop-val">Pregnant women</span></div>
+          </div>
+          <div class="marginal-note"><strong>Marginal gain:</strong> F11 (blood sugar) + F14 (pregnancy status) is the highest-value two-field combination available. Signal potential 92% — the highest in this document.</div>
+        </div>
+        <div>
+          <div class="db-section-title">Data fields → signal strength</div>
+          <div class="signal-fields">
+            <div class="sf-item core"><span class="sf-strength" style="color:var(--core)">Core</span><span class="sf-num">F11</span><div><div class="sf-field">Blood sugar — fasting + post-meal</div><div class="sf-why">GDM defined by glucose thresholds. No meaningful signal without this measurement.</div></div></div>
+            <div class="sf-item core"><span class="sf-strength" style="color:var(--core)">Core</span><span class="sf-num">F14</span><div><div class="sf-field">Pregnancy status + gestational week</div><div class="sf-why">GDM only occurs in pregnancy. Context-free blood sugar data loses the GDM signal entirely.</div></div></div>
+            <div class="sf-item support"><span class="sf-strength" style="color:var(--support)">Support</span><span class="sf-num">F5</span><div><div class="sf-field">Nutrition — carbohydrate intake proxy</div><div class="sf-why">Dietary pattern directly drives glucose levels. Enables diet-glucose correlation analysis.</div></div></div>
+            <div class="sf-item support"><span class="sf-strength" style="color:var(--support)">Support</span><span class="sf-num">F9</span><div><div class="sf-field">Weight gain during pregnancy</div><div class="sf-why">Excess gestational weight gain is a primary GDM risk factor and treatment response indicator.</div></div></div>
+            <div class="sf-item wallet"><span class="sf-strength" style="color:var(--wallet)">Wallet</span><span class="sf-num">HW</span><div><div class="sf-field">OGTT result / HbA1c</div><div class="sf-why">Formal diagnostic test. Clinically confirms GDM classification.</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- T2 Diabetes -->
+    <div class="disease-card">
+      <div class="dc-header" onclick="mapToggle(this)">
+        <div class="dc-left">
+          <div class="dc-eyebrow">Metabolic · F11 F9 F5 F8 F4 F3</div>
+          <div class="dc-name">Type 2 Diabetes — risk &amp; management</div>
+          <div class="dc-meta">
+            <span class="dc-meta-pill" style="background:#FBF0E8;color:var(--cl-metabolic)">All women · 30–65</span>
+            <span class="dc-meta-pill" style="background:var(--support-bg);color:var(--support)">Strong if F11 available</span>
+          </div>
+        </div>
+        <div class="dc-right">
+          <div><div class="sc-bar"><div class="sc-fill" style="width:85%;background:var(--cl-metabolic)"></div></div><div class="sc-label">Signal potential: 85%</div></div>
+          <div class="dc-toggle">▾</div>
+        </div>
+      </div>
+      <div class="dc-body">
+        <div>
+          <div class="db-section-title">Population — India · Uganda · East Africa</div>
+          <div class="pop-block">
+            <div class="pop-row"><span class="pop-key">India</span><span class="pop-val">101 million with diabetes (2023); world's largest absolute burden <span class="pop-source">ICMR-INDIAB, Lancet Diabetes Endocrinol 2023</span></span></div>
+            <div class="pop-row"><span class="pop-key">Uganda / East Africa</span><span class="pop-val">5–8% prevalence, rising rapidly with urbanisation <span class="pop-source">IDF Diabetes Atlas 2021</span></span></div>
+            <div class="pop-row"><span class="pop-key">Age of peak</span><span class="pop-val">Onset 35–55; increasing in 25–35 in urban India</span></div>
+            <div class="pop-row"><span class="pop-key">User group</span><span class="pop-val">All women 30+; perimenopausal at elevated risk</span></div>
+          </div>
+          <div class="marginal-note"><strong>Marginal gain:</strong> F11 (blood sugar) alone unlocks the strongest signal. Without it, lifestyle proxies provide risk stratification only. F11 is the single highest-value clinical anchor field after menstrual cycle tracking.</div>
+        </div>
+        <div>
+          <div class="db-section-title">Data fields → signal strength</div>
+          <div class="signal-fields">
+            <div class="sf-item core"><span class="sf-strength" style="color:var(--core)">Core</span><span class="sf-num">F11</span><div><div class="sf-field">Blood sugar readings</div><div class="sf-why">Fasting ≥126 mg/dL or random ≥200 mg/dL are diagnostic thresholds. Without this, only risk can be signalled, not disease.</div></div></div>
+            <div class="sf-item support"><span class="sf-strength" style="color:var(--support)">Support</span><span class="sf-num">F9</span><div><div class="sf-field">Weight trend</div><div class="sf-why">Obesity drives insulin resistance. Rising weight + borderline blood sugar = pre-diabetes signal.</div></div></div>
+            <div class="sf-item support"><span class="sf-strength" style="color:var(--support)">Support</span><span class="sf-num">F4</span><div><div class="sf-field">Fatigue — post-meal pattern</div><div class="sf-why">Post-meal energy crashes are characteristic of uncontrolled glucose. Pattern distinct from depression-related fatigue.</div></div></div>
+            <div class="sf-item enrich"><span class="sf-strength" style="color:var(--enrich)">Enrich</span><span class="sf-num">F5</span><div><div class="sf-field">Nutrition log</div><div class="sf-why">Dietary pattern contextualises blood sugar readings. Enables diet-glucose correlation.</div></div></div>
+            <div class="sf-item wallet"><span class="sf-strength" style="color:var(--wallet)">Wallet</span><span class="sf-num">HW</span><div><div class="sf-field">HbA1c blood test result</div><div class="sf-why">3-month glucose average. Clinically confirms diabetes classification.</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hypertension -->
+    <div class="disease-card">
+      <div class="dc-header" onclick="mapToggle(this)">
+        <div class="dc-left">
+          <div class="dc-eyebrow">Metabolic · F12 F13 F9 F8 F1</div>
+          <div class="dc-name">Hypertension</div>
+          <div class="dc-meta">
+            <span class="dc-meta-pill" style="background:#FBF0E8;color:var(--cl-metabolic)">All women · 30–65</span>
+            <span class="dc-meta-pill" style="background:var(--support-bg);color:var(--support)">Requires BP device</span>
+          </div>
+        </div>
+        <div class="dc-right">
+          <div><div class="sc-bar"><div class="sc-fill" style="width:80%;background:var(--cl-metabolic)"></div></div><div class="sc-label">Signal potential: 80%</div></div>
+          <div class="dc-toggle">▾</div>
+        </div>
+      </div>
+      <div class="dc-body">
+        <div>
+          <div class="db-section-title">Population — India · Uganda · East Africa</div>
+          <div class="pop-block">
+            <div class="pop-row"><span class="pop-key">India</span><span class="pop-val">~30% of adults; women: 22% urban, 18% rural <span class="pop-source">NFHS-5 2019–21</span></span></div>
+            <div class="pop-row"><span class="pop-key">Uganda</span><span class="pop-val">Estimated 26–30% of adults; rapidly rising <span class="pop-source">WHO STEPS Uganda survey</span></span></div>
+            <div class="pop-row"><span class="pop-key">Age of peak</span><span class="pop-val">35+ rising sharply; postmenopausal women highest risk</span></div>
+            <div class="pop-row"><span class="pop-key">User group</span><span class="pop-val">All women 30+; perimenopausal and postmenopausal</span></div>
+          </div>
+          <div class="marginal-note"><strong>Marginal gain:</strong> F12 (BP) is the clinical anchor — it makes the signal strong and immediate. F12 + F13 (stress) reveals the stress-driven pattern highly relevant for pharma lifestyle intervention research.</div>
+        </div>
+        <div>
+          <div class="db-section-title">Data fields → signal strength</div>
+          <div class="signal-fields">
+            <div class="sf-item core"><span class="sf-strength" style="color:var(--core)">Core</span><span class="sf-num">F12</span><div><div class="sf-field">Blood pressure readings (systolic / diastolic)</div><div class="sf-why">Hypertension defined by BP thresholds (≥130/80). Direct measurement is the only definitive signal.</div></div></div>
+            <div class="sf-item support"><span class="sf-strength" style="color:var(--support)">Support</span><span class="sf-num">F13</span><div><div class="sf-field">Stress level</div><div class="sf-why">Stress is both trigger and driver. Stress + elevated BP shows the mechanism, valuable for pharma context.</div></div></div>
+            <div class="sf-item support"><span class="sf-strength" style="color:var(--support)">Support</span><span class="sf-num">F9</span><div><div class="sf-field">Body weight</div><div class="sf-why">Weight is the strongest modifiable risk factor. Weight trend + BP trend show disease trajectory.</div></div></div>
+            <div class="sf-item enrich"><span class="sf-strength" style="color:var(--enrich)">Enrich</span><span class="sf-num">F1</span><div><div class="sf-field">Emotional labelling</div><div class="sf-why">Co-movement of emotional state and BP reveals stress-driven vs structural hypertension. Differentiates treatment need.</div></div></div>
+            <div class="sf-item wallet"><span class="sf-strength" style="color:var(--wallet)">Wallet</span><span class="sf-num">HW</span><div><div class="sf-field">Clinical BP record / antihypertensive prescription</div><div class="sf-why">Prescription confirms diagnosis. Prior BP readings establish baseline trajectory.</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CLUSTER 3: NUTRITIONAL -->
+<div class="cluster" data-cluster="nutritional">
+  <div class="cluster-header">
+    <div class="cluster-stripe" style="background:var(--cl-nutritional)"></div>
+    <div class="cluster-titles"><h2 style="color:var(--cl-nutritional)">Nutritional deficiencies</h2><p>Massively prevalent in Halla Health's markets — largely invisible in existing structured datasets</p></div>
+    <span class="cluster-count">2 conditions</span>
+  </div>
+  <div class="disease-grid">
+
+    <!-- Anaemia -->
+    <div class="disease-card">
+      <div class="dc-header" onclick="mapToggle(this)">
+        <div class="dc-left">
+          <div class="dc-eyebrow">Nutritional · F4 F2 F5 F8 F1</div>
+          <div class="dc-name">Iron-Deficiency Anaemia</div>
+          <div class="dc-meta">
+            <span class="dc-meta-pill" style="background:#F0F4E0;color:var(--cl-nutritional)">All women — highest in pregnant + adolescents</span>
+            <span class="dc-meta-pill" style="background:var(--support-bg);color:var(--support)">No clinical test needed for signal</span>
+          </div>
+        </div>
+        <div class="dc-right">
+          <div><div class="sc-bar"><div class="sc-fill" style="width:70%;background:var(--cl-nutritional)"></div></div><div class="sc-label">Signal potential: 70%</div></div>
+          <div class="dc-toggle">▾</div>
+        </div>
+      </div>
+      <div class="dc-body">
+        <div>
+          <div class="db-section-title">Population — India · Uganda · East Africa</div>
+          <div class="pop-block">
+            <div class="pop-row"><span class="pop-key">India (NFHS-5 2019–21)</span><span class="pop-val">57% of women of reproductive age anaemic; 52.2% of pregnant women <span class="pop-source">BMC Public Health 2024; NFHS-5</span></span></div>
+            <div class="pop-row"><span class="pop-key">Uganda</span><span class="pop-val">24% women of childbearing age; 65.8% of pregnant women in sub-Saharan Africa <span class="pop-source">PMC 2016; Gulu/Hoima hospital study</span></span></div>
+            <div class="pop-row"><span class="pop-key">Age of highest burden</span><span class="pop-val">Adolescent girls (rapid growth demand) + pregnant women (increased iron need)</span></div>
+            <div class="pop-row"><span class="pop-key">User group</span><span class="pop-val">Adolescent girls + women of reproductive age + pregnant women</span></div>
+          </div>
+          <div class="marginal-note"><strong>Marginal gain:</strong> Fatigue (F4) + heavy cycle (F2) + nutrition adequacy (F5) creates the anaemia signal without any blood test. In populations where lab access is limited, this combination identifies probable anaemia — something no existing dataset provides for India and Uganda at scale.</div>
+        </div>
+        <div>
+          <div class="db-section-title">Data fields → signal strength</div>
+          <div class="signal-fields">
+            <div class="sf-item core"><span class="sf-strength" style="color:var(--core)">Core</span><span class="sf-num">F4</span><div><div class="sf-field">Fatigue — exertional, present on waking</div><div class="sf-why">Fatigue on mild exertion is the cardinal symptom. Key sub-field: does fatigue worsen on climbing stairs or light activity?</div></div></div>
+            <div class="sf-item support"><span class="sf-strength" style="color:var(--support)">Support</span><span class="sf-num">F2</span><div><div class="sf-field">Menstrual flow volume (heavy bleeding)</div><div class="sf-why">Menorrhagia is the primary cause of iron-deficiency anaemia in premenopausal women in LMICs.</div></div></div>
+            <div class="sf-item support"><span class="sf-strength" style="color:var(--support)">Support</span><span class="sf-num">F5</span><div><div class="sf-field">Nutrition — iron-rich food frequency</div><div class="sf-why">Low dietary iron is a primary cause, especially in vegetarian populations.</div></div></div>
+            <div class="sf-item enrich"><span class="sf-strength" style="color:var(--enrich)">Enrich</span><span class="sf-num">F8</span><div><div class="sf-field">Physical activity decline</div><div class="sf-why">Reduced exercise tolerance (distinct from disinterest) is an anaemia signal. Co-movement with fatigue strengthens it.</div></div></div>
+            <div class="sf-item wallet"><span class="sf-strength" style="color:var(--wallet)">Wallet</span><span class="sf-num">HW</span><div><div class="sf-field">CBC — haemoglobin level</div><div class="sf-why">Hb &lt;12g/dL confirms anaemia. Converts probable to confirmed signal for pharma-grade use.</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vitamin D -->
+    <div class="disease-card">
+      <div class="dc-header" onclick="mapToggle(this)">
+        <div class="dc-left">
+          <div class="dc-eyebrow">Nutritional · F4 F10 F1</div>
+          <div class="dc-name">Vitamin D Deficiency</div>
+          <div class="dc-meta">
+            <span class="dc-meta-pill" style="background:#F0F4E0;color:var(--cl-nutritional)">All women · 15–65</span>
+            <span class="dc-meta-pill" style="background:var(--core-bg);color:var(--core)">Weak signal — wallet needed</span>
+          </div>
+        </div>
+        <div class="dc-right">
+          <div><div class="sc-bar"><div class="sc-fill" style="width:38%;background:var(--cl-nutritional)"></div></div><div class="sc-label">Signal potential: 38%</div></div>
+          <div class="dc-toggle">▾</div>
+        </div>
+      </div>
+      <div class="dc-body">
+        <div>
+          <div class="db-section-title">Population — India · Uganda · East Africa</div>
+          <div class="pop-block">
+            <div class="pop-row"><span class="pop-key">India</span><span class="pop-val">70–90% of Indian population deficient; highest in urban women with low sun exposure <span class="pop-source">Ritu &amp; Gupta, J Fam Community Med 2014</span></span></div>
+            <div class="pop-row"><span class="pop-key">East Africa</span><span class="pop-val">Paradoxically high despite sun — estimated 30–60% deficient due to cultural covering <span class="pop-source">Wacker &amp; Holick, Nutrients 2013</span></span></div>
+            <div class="pop-row"><span class="pop-key">User group</span><span class="pop-val">All women; pregnant + indoor-dwelling at highest risk</span></div>
+          </div>
+          <div class="marginal-note"><strong>Marginal gain:</strong> App signal is weak — fatigue + muscle pain + low mood overlap heavily with depression and anaemia. Health wallet (25(OH)D blood test) is the critical upgrade. Primary value is population-level prevalence mapping, not individual diagnosis.</div>
+        </div>
+        <div>
+          <div class="db-section-title">Data fields → signal strength</div>
+          <div class="signal-fields">
+            <div class="sf-item support"><span class="sf-strength" style="color:var(--support)">Support</span><span class="sf-num">F4</span><div><div class="sf-field">Fatigue (non-specific)</div><div class="sf-why">Most common symptom but non-specific without combining with other streams.</div></div></div>
+            <div class="sf-item support"><span class="sf-strength" style="color:var(--support)">Support</span><span class="sf-num">F10</span><div><div class="sf-field">Musculoskeletal / bone pain (diffuse)</div><div class="sf-why">Diffuse bone pain and muscle weakness characteristic of severe deficiency.</div></div></div>
+            <div class="sf-item enrich"><span class="sf-strength" style="color:var(--enrich)">Enrich</span><span class="sf-num">F1</span><div><div class="sf-field">Low mood / depression score</div><div class="sf-why">Vitamin D deficiency associated with depression. Adds context to otherwise non-specific symptom picture.</div></div></div>
+            <div class="sf-item wallet"><span class="sf-strength" style="color:var(--wallet)">Wallet</span><span class="sf-num">HW</span><div><div class="sf-field">25(OH)D blood test result</div><div class="sf-why">&lt;20ng/mL = deficiency. Only definitive signal. Without this, app data cannot distinguish from anaemia or depression.</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- CLUSTER 4: MENTAL HEALTH -->
+<div class="cluster" data-cluster="mental">
+  <div class="cluster-header">
+    <div class="cluster-stripe" style="background:var(--cl-mental)"></div>
+    <div class="cluster-titles"><h2 style="color:var(--cl-mental)">Mental health</h2><p>Where emotional labelling (built to spec) is the primary anchor — the condition cluster most directly shaped by F1</p></div>
+    <span class="cluster-count">2 conditions</span>
+  </div>
+  <div class="disease-grid">
+
+    <!-- Depression -->
+    <div class="disease-card">
+      <div class="dc-header" onclick="mapToggle(this)">
+        <div class="dc-left">
+          <div class="dc-eyebrow">Mental health · F1 F3 F8 F13 F4</div>
+          <div class="dc-name">Depression</div>
+          <div class="dc-meta">
+            <span class="dc-meta-pill" style="background:#E5EBF9;color:var(--cl-mental)">All women · 15–65</span>
+            <span class="dc-meta-pill" style="background:var(--enrich-bg);color:var(--enrich)">Emotional labelling is the anchor</span>
+          </div>
+        </div>
+        <div class="dc-right">
+          <div><div class="sc-bar"><div class="sc-fill" style="width:78%;background:var(--cl-mental)"></div></div><div class="sc-label">Signal potential: 78%</div></div>
+          <div class="dc-toggle">▾</div>
+        </div>
+      </div>
+      <div class="dc-body">
+        <div>
+          <div class="db-section-title">Population — India · Uganda · East Africa</div>
+          <div class="pop-block">
+            <div class="pop-row"><span class="pop-key">Uganda (meta-analysis)</span><span class="pop-val">30.2% pooled prevalence; postpartum/pregnant women 26.9% <span class="pop-source">PLOS ONE 2022; systematic review</span></span></div>
+            <div class="pop-row"><span class="pop-key">India</span><span class="pop-val">~15–20% of women; postnatal period 11–26% <span class="pop-source">PMC 2015; rural Karnataka study</span></span></div>
+            <div class="pop-row"><span class="pop-key">Age of peak</span><span class="pop-val">15–45 (reproductive years); postpartum highest acute risk</span></div>
+            <div class="pop-row"><span class="pop-key">User group</span><span class="pop-val">All women; postpartum women at highest acute risk</span></div>
+          </div>
+          <div class="db-section-title">Emotional labelling — recommended spec (starting from zero)</div>
+          <div class="el-spec">
+            <div class="el-spec-title">Minimum fields for a PHQ-9 proxy signal</div>
+            <div class="el-spec-item"><strong>Mood valence</strong> — 1–5 daily. Persistent low mood ≥2 weeks is the core depressive criterion</div>
+            <div class="el-spec-item"><strong>Interest / pleasure loss flag</strong> — "Did you enjoy activities today?" yes/no. Anhedonia is the second core criterion — separate from low mood</div>
+            <div class="el-spec-item"><strong>Energy rating</strong> — 1–5 daily. Persistent fatigue is PHQ-9 item 4</div>
+            <div class="el-spec-item"><strong>Functional impact</strong> — "Did symptoms make it hard to work or be with others today?" Severity anchor for PHQ-9 validation</div>
+            <div class="el-spec-item"><strong>Monthly embedded PHQ-2</strong> — two validated questions; insert into monthly check-in as a screener</div>
+          </div>
+          <div class="marginal-note"><strong>Marginal gain:</strong> F1 (to spec) + F3 (sleep) together create a depression signal stronger than many clinical tools — because it is longitudinal. Two weeks of daily mood + sleep produces a time-series that a single consultation cannot match.</div>
+        </div>
+        <div>
+          <div class="db-section-title">Data fields → signal strength</div>
+          <div class="signal-fields">
+            <div class="sf-item core"><span class="sf-strength" style="color:var(--core)">Core</span><span class="sf-num">F1</span><div><div class="sf-field">Emotional labelling — valence + anhedonia + energy + functional impact, daily timestamped</div><div class="sf-why">Depression requires persistent symptoms across ≥2 weeks. Only longitudinal daily data captures this. Spec must include anhedonia separately from mood valence.</div></div></div>
+            <div class="sf-item support"><span class="sf-strength" style="color:var(--support)">Support</span><span class="sf-num">F3</span><div><div class="sf-field">Sleep quality — duration + quality + early morning waking</div><div class="sf-why">Insomnia (especially early morning waking) is a core depressive feature. Sleep + mood co-movement is the strongest two-field depression signal.</div></div></div>
+            <div class="sf-item support"><span class="sf-strength" style="color:var(--support)">Support</span><span class="sf-num">F8</span><div><div class="sf-field">Physical activity decline</div><div class="sf-why">Psychomotor retardation and social withdrawal are depression features. Activity decline correlated with mood is a behavioural marker.</div></div></div>
+            <div class="sf-item enrich"><span class="sf-strength" style="color:var(--enrich)">Enrich</span><span class="sf-num">F13</span><div><div class="sf-field">Stress and life events log</div><div class="sf-why">Contextualises mood data — distinguishes situational from clinical major depressive disorder.</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Postnatal depression -->
+    <div class="disease-card">
+      <div class="dc-header" onclick="mapToggle(this)">
+        <div class="dc-left">
+          <div class="dc-eyebrow">Mental health + Maternal · F1 F14 F3 F13 F4</div>
+          <div class="dc-name">Postnatal Depression (PND)</div>
+          <div class="dc-meta">
+            <span class="dc-meta-pill" style="background:#F5EAF2;color:var(--cl-maternal)">Postpartum women · 0–12 months post-birth</span>
+            <span class="dc-meta-pill" style="background:var(--support-bg);color:var(--support)">High LMIC data gap</span>
+          </div>
+        </div>
+        <div class="dc-right">
+          <div><div class="sc-bar"><div class="sc-fill" style="width:85%;background:var(--cl-mental)"></div></div><div class="sc-label">Signal potential: 85%</div></div>
+          <div class="dc-toggle">▾</div>
+        </div>
+      </div>
+      <div class="dc-body">
+        <div>
+          <div class="db-section-title">Population — India · Uganda · East Africa</div>
+          <div class="pop-block">
+            <div class="pop-row"><span class="pop-key">Uganda</span><span class="pop-val">19.2–21.1% in community; up to 43% in some studies <span class="pop-source">PMC 2020; Arach et al., PLOS ONE</span></span></div>
+            <div class="pop-row"><span class="pop-key">India</span><span class="pop-val">11–26.3%; most cases undetected by the health system <span class="pop-source">PMC 2015; Karnataka postnatal study</span></span></div>
+            <div class="pop-row"><span class="pop-key">Africa pooled</span><span class="pop-val">17.8% pooled prevalence <span class="pop-source">PLOS ONE 2020; Gelaye et al. meta-analysis</span></span></div>
+            <div class="pop-row"><span class="pop-key">Screening gap</span><span class="pop-val">&gt;50% of cases undetected by healthcare providers — even in India</span></div>
+            <div class="pop-row"><span class="pop-key">User group</span><span class="pop-val">Postpartum women (weeks 1–52 post-birth)</span></div>
+          </div>
+          <div class="db-section-title">Emotional labelling — recommended spec for PND</div>
+          <div class="el-spec">
+            <div class="el-spec-title">Edinburgh Postnatal Depression Scale (EPDS) proxy — embed in monthly postpartum check-in</div>
+            <div class="el-spec-item"><strong>Mood over past week</strong> — 4-point scale. EPDS item 1 — sustained mood state, not daily fluctuation</div>
+            <div class="el-spec-item"><strong>Enjoyment of things</strong> — 4-point scale. EPDS item 2 — anhedonia in postpartum context</div>
+            <div class="el-spec-item"><strong>Self-blame out of proportion</strong> — EPDS item 3 — guilt is a specific PND feature often missed</div>
+            <div class="el-spec-item"><strong>Anxious or worried without good reason</strong> — EPDS items 4/5 — perinatal anxiety overlaps but is distinct</div>
+            <div class="el-spec-item"><strong>Feeling overwhelmed</strong> — EPDS item 10 — closest to suicidal ideation screening in the scale</div>
+          </div>
+          <div class="marginal-note"><strong>Marginal gain:</strong> F14 (postpartum status) + F1 (EPDS-proxied emotional labelling) creates a signal that does not exist in any current structured dataset at scale from India and Uganda. Pharma buyers active in this space: Sage Therapeutics, J&amp;J, multiple global health funders.</div>
+        </div>
+        <div>
+          <div class="db-section-title">Data fields → signal strength</div>
+          <div class="signal-fields">
+            <div class="sf-item core"><span class="sf-strength" style="color:var(--core)">Core</span><span class="sf-num">F1</span><div><div class="sf-field">Emotional labelling — EPDS-proxied (mood, anhedonia, anxiety, guilt, overwhelm)</div><div class="sf-why">EPDS is the gold-standard PND screening tool. Embedding its items in a monthly postpartum check-in creates a validated proxy signal.</div></div></div>
+            <div class="sf-item core"><span class="sf-strength" style="color:var(--core)">Core</span><span class="sf-num">F14</span><div><div class="sf-field">Postpartum status + weeks since delivery</div><div class="sf-why">PND is context-specific. The same emotional scores have different clinical meaning in postpartum period vs general population.</div></div></div>
+            <div class="sf-item support"><span class="sf-strength" style="color:var(--support)">Support</span><span class="sf-num">F3</span><div><div class="sf-field">Sleep quality</div><div class="sf-why">Sleep deprivation + mood distinguishes PND from normal new-parent fatigue. Pattern co-movement is key.</div></div></div>
+            <div class="sf-item enrich"><span class="sf-strength" style="color:var(--enrich)">Enrich</span><span class="sf-num">F13</span><div><div class="sf-field">Social support context</div><div class="sf-why">"Do you feel supported at home?" — partner support absence is the strongest single PND predictor.</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CLUSTER 5: THYROID -->
+<div class="cluster" data-cluster="thyroid">
+  <div class="cluster-header">
+    <div class="cluster-stripe" style="background:var(--cl-thyroid)"></div>
+    <div class="cluster-titles"><h2 style="color:var(--cl-thyroid)">Thyroid disorders</h2><p>Massively under-diagnosed in women — the multi-stream signal where cross-domain data has the greatest advantage</p></div>
+    <span class="cluster-count">1 condition</span>
+  </div>
+  <div class="disease-grid">
+    <div class="disease-card">
+      <div class="dc-header" onclick="mapToggle(this)">
+        <div class="dc-left">
+          <div class="dc-eyebrow">Thyroid · F4 F9 F6 F1 F2 F3</div>
+          <div class="dc-name">Hypothyroidism</div>
+          <div class="dc-meta">
+            <span class="dc-meta-pill" style="background:#E5F2F2;color:var(--cl-thyroid)">All women · 30–65; highest 45+</span>
+            <span class="dc-meta-pill" style="background:var(--enrich-bg);color:var(--enrich)">Multi-stream advantage</span>
+          </div>
+        </div>
+        <div class="dc-right">
+          <div><div class="sc-bar"><div class="sc-fill" style="width:72%;background:var(--cl-thyroid)"></div></div><div class="sc-label">Signal potential: 72%</div></div>
+          <div class="dc-toggle">▾</div>
+        </div>
+      </div>
+      <div class="dc-body">
+        <div>
+          <div class="db-section-title">Population — India · Uganda · East Africa</div>
+          <div class="pop-block">
+            <div class="pop-row"><span class="pop-key">India</span><span class="pop-val">10–12% of women; subclinical hypothyroidism 9.4%; women 10× more likely than men <span class="pop-source">Unnikrishnan et al., Indian J Endocrinol Metab 2011</span></span></div>
+            <div class="pop-row"><span class="pop-key">Postmenopausal women India</span><span class="pop-val">27.3% prevalence — 1 in 3 menopausal women hypothyroid <span class="pop-source">J Family Med Prim Care 2024; northern India study</span></span></div>
+            <div class="pop-row"><span class="pop-key">East Africa</span><span class="pop-val">Estimated 5–10%; iodine deficiency historically high <span class="pop-source">WHO Micronutrient Database</span></span></div>
+            <div class="pop-row"><span class="pop-key">Diagnosis gap</span><span class="pop-val">"Iceberg phenomenon" — symptoms vague, most diagnosed only when severe</span></div>
+            <div class="pop-row"><span class="pop-key">User group</span><span class="pop-val">All women 30+; postmenopausal women highest burden</span></div>
+          </div>
+          <div class="marginal-note"><strong>Marginal gain:</strong> Hypothyroidism is where combining multiple low-friction streams creates a signal no single stream can approach alone. Fatigue + weight gain + dry skin + low mood + heavy periods together achieve 72% confidence — without any blood test. This is the multi-stream cross-domain advantage in its clearest form.</div>
+        </div>
+        <div>
+          <div class="db-section-title">Data fields → signal strength</div>
+          <div class="signal-fields">
+            <div class="sf-item core"><span class="sf-strength" style="color:var(--core)">Core</span><span class="sf-num">F4</span><div><div class="sf-field">Fatigue — persistent, present on waking (not exertional)</div><div class="sf-why">Fatigue present in &gt;90% of hypothyroid cases. Key distinction from anaemia: not worsened by specific activity, present on waking.</div></div></div>
+            <div class="sf-item support"><span class="sf-strength" style="color:var(--support)">Support</span><span class="sf-num">F9</span><div><div class="sf-field">Unexplained weight gain</div><div class="sf-why">Weight gain despite unchanged diet/activity is characteristic. Trend over 3+ months is the signal, not a single reading.</div></div></div>
+            <div class="sf-item support"><span class="sf-strength" style="color:var(--support)">Support</span><span class="sf-num">F6</span><div><div class="sf-field">Skin dryness / hair changes</div><div class="sf-why">Dry skin and hair loss are classic hypothyroid signs. Skin rating sub-field: "skin feels dry/rough" distinct from acne.</div></div></div>
+            <div class="sf-item support"><span class="sf-strength" style="color:var(--support)">Support</span><span class="sf-num">F2</span><div><div class="sf-field">Heavy menstrual bleeding</div><div class="sf-why">Hypothyroidism causes heavy periods. Combined with other streams, this is a strong confirming signal.</div></div></div>
+            <div class="sf-item enrich"><span class="sf-strength" style="color:var(--enrich)">Enrich</span><span class="sf-num">F1</span><div><div class="sf-field">Emotional labelling — low mood + cognitive fog</div><div class="sf-why">Depression and cognitive slowing are hypothyroid features that co-occur with the physical signs above.</div></div></div>
+            <div class="sf-item wallet"><span class="sf-strength" style="color:var(--wallet)">Wallet</span><span class="sf-num">HW</span><div><div class="sf-field">TSH blood test result</div><div class="sf-why">TSH &gt;4.0 mIU/L = hypothyroidism. Definitive confirmation. Most commonly available blood test in India.</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CLUSTER 6: GUT -->
+<div class="cluster" data-cluster="gut">
+  <div class="cluster-header">
+    <div class="cluster-stripe" style="background:var(--cl-gut)"></div>
+    <div class="cluster-titles"><h2 style="color:var(--cl-gut)">Gut &amp; GI</h2><p>Where the gut-brain axis gives emotional labelling its most distinctive cross-domain value</p></div>
+    <span class="cluster-count">1 condition</span>
+  </div>
+  <div class="disease-grid">
+    <div class="disease-card">
+      <div class="dc-header" onclick="mapToggle(this)">
+        <div class="dc-left">
+          <div class="dc-eyebrow">Gut · F7 F1 F5 F13 F8</div>
+          <div class="dc-name">Irritable Bowel Syndrome (IBS)</div>
+          <div class="dc-meta">
+            <span class="dc-meta-pill" style="background:#F5EED8;color:var(--cl-gut)">All women · 18–45 highest</span>
+            <span class="dc-meta-pill" style="background:var(--enrich-bg);color:var(--enrich)">Gut-brain axis signal</span>
+          </div>
+        </div>
+        <div class="dc-right">
+          <div><div class="sc-bar"><div class="sc-fill" style="width:68%;background:var(--cl-gut)"></div></div><div class="sc-label">Signal potential: 68%</div></div>
+          <div class="dc-toggle">▾</div>
+        </div>
+      </div>
+      <div class="dc-body">
+        <div>
+          <div class="db-section-title">Population — India · Uganda · East Africa</div>
+          <div class="pop-block">
+            <div class="pop-row"><span class="pop-key">India</span><span class="pop-val">4–22% prevalence; women 2× more likely than men; urban higher <span class="pop-source">Ghoshal et al., J Gastroenterol Hepatol 2011</span></span></div>
+            <div class="pop-row"><span class="pop-key">East Africa</span><span class="pop-val">Estimated 8–15%; post-infectious IBS common following enteric infections <span class="pop-source">Tack et al., Gut 2006</span></span></div>
+            <div class="pop-row"><span class="pop-key">Age of peak</span><span class="pop-val">18–45; often triggered by stress and menstrual cycle</span></div>
+            <div class="pop-row"><span class="pop-key">User group</span><span class="pop-val">Women of reproductive age (2× male prevalence)</span></div>
+          </div>
+          <div class="marginal-note"><strong>Marginal gain:</strong> F7 (GI symptoms) alone is insufficient — IBS is defined by pattern, not presence. F7 + F1 (emotional state) + F13 (stress) create the gut-brain axis signal. GI symptom flares co-moving with stress and low mood is a much more specific IBS signal than GI data alone.</div>
+        </div>
+        <div>
+          <div class="db-section-title">Data fields → signal strength</div>
+          <div class="signal-fields">
+            <div class="sf-item core"><span class="sf-strength" style="color:var(--core)">Core</span><span class="sf-num">F7</span><div><div class="sf-field">GI symptoms — bloating, bowel habit change, abdominal pain</div><div class="sf-why">IBS defined by recurrent abdominal pain related to bowel function. Pattern over weeks, not single episodes.</div></div></div>
+            <div class="sf-item support"><span class="sf-strength" style="color:var(--support)">Support</span><span class="sf-num">F1</span><div><div class="sf-field">Emotional labelling — stress and anxiety co-movement</div><div class="sf-why">Gut-brain axis: stress triggers GI symptoms in IBS. GI flare + high stress on same day is the defining cross-domain pattern.</div></div></div>
+            <div class="sf-item support"><span class="sf-strength" style="color:var(--support)">Support</span><span class="sf-num">F13</span><div><div class="sf-field">Stress level and life events</div><div class="sf-why">Stress co-moving with GI symptoms across ≥3 episodes establishes the IBS pattern.</div></div></div>
+            <div class="sf-item enrich"><span class="sf-strength" style="color:var(--enrich)">Enrich</span><span class="sf-num">F5</span><div><div class="sf-field">Diet and food triggers log</div><div class="sf-why">Certain foods trigger IBS episodes. Diet log enables food-symptom correlation analysis.</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CLUSTER 7: MATERNAL -->
+<div class="cluster" data-cluster="maternal">
+  <div class="cluster-header">
+    <div class="cluster-stripe" style="background:var(--cl-maternal)"></div>
+    <div class="cluster-titles"><h2 style="color:var(--cl-maternal)">Maternal &amp; pregnancy-specific</h2><p>Conditions during and after pregnancy — highest priority for Halla Health's MNCH journey</p></div>
+    <span class="cluster-count">1 condition</span>
+  </div>
+  <div class="disease-grid">
+    <div class="disease-card">
+      <div class="dc-header" onclick="mapToggle(this)">
+        <div class="dc-left">
+          <div class="dc-eyebrow">Maternal · F12 F14 F9 F10</div>
+          <div class="dc-name">Pre-eclampsia risk signalling</div>
+          <div class="dc-meta">
+            <span class="dc-meta-pill" style="background:#F5EAF2;color:var(--cl-maternal)">Pregnant women · all ages</span>
+            <span class="dc-meta-pill" style="background:var(--wallet-bg);color:var(--wallet)">BP device critical</span>
+          </div>
+        </div>
+        <div class="dc-right">
+          <div><div class="sc-bar"><div class="sc-fill" style="width:78%;background:var(--cl-maternal)"></div></div><div class="sc-label">Signal potential: 78%</div></div>
+          <div class="dc-toggle">▾</div>
+        </div>
+      </div>
+      <div class="dc-body">
+        <div>
+          <div class="db-section-title">Population — India · Uganda · East Africa</div>
+          <div class="pop-block">
+            <div class="pop-row"><span class="pop-key">Global</span><span class="pop-val">5–8% of pregnancies; leading cause of maternal mortality <span class="pop-source">WHO; Brown et al., Lancet 2018</span></span></div>
+            <div class="pop-row"><span class="pop-key">Uganda</span><span class="pop-val">58.9% of women with hypertensive disorders of pregnancy have adverse perinatal outcomes <span class="pop-source">PMC 2024; Mbarara RRH study</span></span></div>
+            <div class="pop-row"><span class="pop-key">India</span><span class="pop-val">~10% of maternal deaths attributed to hypertensive disorders <span class="pop-source">National Health Mission India</span></span></div>
+            <div class="pop-row"><span class="pop-key">User group</span><span class="pop-val">Pregnant women — all ages; primigravidae and &gt;35 highest risk</span></div>
+          </div>
+          <div class="marginal-note"><strong>Marginal gain:</strong> F12 (BP) + F14 (pregnancy) + F10 (headache / visual disturbance flag) creates an early warning system for pre-eclampsia that could have genuine clinical impact in Uganda and India where antenatal monitoring access is inconsistent.</div>
+        </div>
+        <div>
+          <div class="db-section-title">Data fields → signal strength</div>
+          <div class="signal-fields">
+            <div class="sf-item core"><span class="sf-strength" style="color:var(--core)">Core</span><span class="sf-num">F12</span><div><div class="sf-field">Blood pressure — systolic ≥140 or diastolic ≥90 in pregnancy</div><div class="sf-why">Pre-eclampsia is defined by BP threshold in pregnancy (&gt;20 weeks). Without measurement, only risk factors can be identified.</div></div></div>
+            <div class="sf-item core"><span class="sf-strength" style="color:var(--core)">Core</span><span class="sf-num">F14</span><div><div class="sf-field">Pregnancy status + gestational week (&gt;20 weeks)</div><div class="sf-why">Pre-eclampsia only occurs after 20 weeks gestation. Context is essential for the signal to be meaningful.</div></div></div>
+            <div class="sf-item support"><span class="sf-strength" style="color:var(--support)">Support</span><span class="sf-num">F10</span><div><div class="sf-field">Headache severity + visual disturbance flag</div><div class="sf-why">Severe headache and visual changes are pre-eclampsia warning signs — self-reported, can trigger clinical referral urgently.</div></div></div>
+            <div class="sf-item enrich"><span class="sf-strength" style="color:var(--enrich)">Enrich</span><span class="sf-num">F9</span><div><div class="sf-field">Rapid weight gain / swelling flag</div><div class="sf-why">Oedema and rapid fluid retention are pre-eclampsia features. "Swelling in hands or face" self-report flag.</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- MARGINAL SIGNAL TABLE -->
+<div class="marginal-table-wrap">
+  <div class="mt-title">Marginal signal table</div>
+  <div class="mt-sub">For each data field Halla Health does not currently collect, how many disease signals does adding it unlock or meaningfully strengthen — and how difficult is it to collect? Ranked by signal yield relative to collection effort. <strong>Friction 1 = trivial (one slider). Friction 5 = requires device or clinical setup.</strong></div>
+  <table class="marginal-table">
+    <thead>
+      <tr>
+        <th>Field</th>
+        <th>Collection friction<br><span style="font-weight:400;opacity:.7">1 easy → 5 hard</span></th>
+        <th>Diseases unlocked or strengthened</th>
+        <th>Yield ÷ friction</th>
+        <th>Priority</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><div class="mt-field-name">F2 · Menstrual cycle dates + pain score</div><div class="mt-field-sub">Cycle start/end, flow volume (light/moderate/heavy/flooding), menstrual pain 0–10</div></td>
+        <td><div class="mt-friction"><div class="friction-dot fd-fill"></div><div class="friction-dot fd-empty"></div><div class="friction-dot fd-empty"></div><div class="friction-dot fd-empty"></div><div class="friction-dot fd-empty"></div></div><div style="font-size:10px;color:var(--muted);margin-top:3px">Entered once per cycle onset</div></td>
+        <td><div class="mt-diseases">
+          <span class="mt-d-tag" style="background:#F5EAF8;color:var(--cl-hormonal)">PCOS (core)</span>
+          <span class="mt-d-tag" style="background:#F5EAF8;color:var(--cl-hormonal)">Endometriosis (core)</span>
+          <span class="mt-d-tag" style="background:#F5EAF8;color:var(--cl-hormonal)">Fibroids (core)</span>
+          <span class="mt-d-tag" style="background:#F5EAF8;color:var(--cl-hormonal)">PMDD (core)</span>
+          <span class="mt-d-tag" style="background:#F0F4E0;color:var(--cl-nutritional)">Anaemia (support)</span>
+          <span class="mt-d-tag" style="background:#E5F2F2;color:var(--cl-thyroid)">Hypothyroid (support)</span>
+        </div></td>
+        <td style="font-family:var(--mono);font-size:14px;font-weight:500">6 ÷ 1 = <strong>6.0</strong></td>
+        <td><span class="mt-priority pr-high">Highest priority</span></td>
+      </tr>
+      <tr>
+        <td><div class="mt-field-name">F4 · Fatigue severity + time-of-day pattern</div><div class="mt-field-sub">One slider 0–10 + morning / afternoon / evening / constant; exertional yes/no</div></td>
+        <td><div class="mt-friction"><div class="friction-dot fd-fill"></div><div class="friction-dot fd-empty"></div><div class="friction-dot fd-empty"></div><div class="friction-dot fd-empty"></div><div class="friction-dot fd-empty"></div></div><div style="font-size:10px;color:var(--muted);margin-top:3px">Add to existing daily check-in</div></td>
+        <td><div class="mt-diseases">
+          <span class="mt-d-tag" style="background:#F0F4E0;color:var(--cl-nutritional)">Anaemia (core)</span>
+          <span class="mt-d-tag" style="background:#E5F2F2;color:var(--cl-thyroid)">Hypothyroid (core)</span>
+          <span class="mt-d-tag" style="background:#E5EBF9;color:var(--cl-mental)">Depression (support)</span>
+          <span class="mt-d-tag" style="background:#FBF0E8;color:var(--cl-metabolic)">Diabetes (support)</span>
+          <span class="mt-d-tag" style="background:#F5EAF8;color:var(--cl-hormonal)">Endometriosis (support)</span>
+          <span class="mt-d-tag" style="background:#F5EAF8;color:var(--cl-hormonal)">PCOS (enrich)</span>
+        </div></td>
+        <td style="font-family:var(--mono);font-size:14px;font-weight:500">6 ÷ 1 = <strong>6.0</strong></td>
+        <td><span class="mt-priority pr-high">Highest priority</span></td>
+      </tr>
+      <tr>
+        <td><div class="mt-field-name">F1 · Emotional labelling — built to spec</div><div class="mt-field-sub">Valence 1–5, anhedonia flag, energy 1–5, irritability flag, context tag, functional impact — daily timestamped. Monthly PHQ-2 embedded.</div></td>
+        <td><div class="mt-friction"><div class="friction-dot fd-fill"></div><div class="friction-dot fd-fill"></div><div class="friction-dot fd-empty"></div><div class="friction-dot fd-empty"></div><div class="friction-dot fd-empty"></div></div><div style="font-size:10px;color:var(--muted);margin-top:3px">Full rebuild from zero — design effort, not user friction</div></td>
+        <td><div class="mt-diseases">
+          <span class="mt-d-tag" style="background:#E5EBF9;color:var(--cl-mental)">Depression (core)</span>
+          <span class="mt-d-tag" style="background:#F5EAF2;color:var(--cl-maternal)">PND (core)</span>
+          <span class="mt-d-tag" style="background:#F5EAF8;color:var(--cl-hormonal)">PMDD (core)</span>
+          <span class="mt-d-tag" style="background:#F5EAF8;color:var(--cl-hormonal)">PCOS (enrich)</span>
+          <span class="mt-d-tag" style="background:#E5F2F2;color:var(--cl-thyroid)">Hypothyroid (enrich)</span>
+          <span class="mt-d-tag" style="background:#F5EED8;color:var(--cl-gut)">IBS (support)</span>
+          <span class="mt-d-tag" style="background:#FBF0E8;color:var(--cl-metabolic)">Hypertension (enrich)</span>
+        </div></td>
+        <td style="font-family:var(--mono);font-size:14px;font-weight:500">7 ÷ 2 = <strong>3.5</strong></td>
+        <td><span class="mt-priority pr-high">Highest priority</span></td>
+      </tr>
+      <tr>
+        <td><div class="mt-field-name">F6 · Skin condition rating</div><div class="mt-field-sub">Weekly self-rated: clear / mild breakout / significant breakout / dry-rough skin</div></td>
+        <td><div class="mt-friction"><div class="friction-dot fd-fill"></div><div class="friction-dot fd-empty"></div><div class="friction-dot fd-empty"></div><div class="friction-dot fd-empty"></div><div class="friction-dot fd-empty"></div></div><div style="font-size:10px;color:var(--muted);margin-top:3px">Weekly; 4-option single tap</div></td>
+        <td><div class="mt-diseases">
+          <span class="mt-d-tag" style="background:#F5EAF8;color:var(--cl-hormonal)">PCOS (support)</span>
+          <span class="mt-d-tag" style="background:#E5F2F2;color:var(--cl-thyroid)">Hypothyroid (support)</span>
+          <span class="mt-d-tag" style="background:#F0F4E0;color:var(--cl-nutritional)">Nutritional deficiency (enrich)</span>
+        </div></td>
+        <td style="font-family:var(--mono);font-size:14px;font-weight:500">3 ÷ 1 = <strong>3.0</strong></td>
+        <td><span class="mt-priority pr-med">High priority</span></td>
+      </tr>
+      <tr>
+        <td><div class="mt-field-name">F7 · GI &amp; gut symptoms</div><div class="mt-field-sub">Daily or weekly flag: none / bloating / abdominal pain / bowel habit change / nausea</div></td>
+        <td><div class="mt-friction"><div class="friction-dot fd-fill"></div><div class="friction-dot fd-empty"></div><div class="friction-dot fd-empty"></div><div class="friction-dot fd-empty"></div><div class="friction-dot fd-empty"></div></div><div style="font-size:10px;color:var(--muted);margin-top:3px">One-question weekly addition</div></td>
+        <td><div class="mt-diseases">
+          <span class="mt-d-tag" style="background:#F5EED8;color:var(--cl-gut)">IBS (core)</span>
+          <span class="mt-d-tag" style="background:#F5EAF8;color:var(--cl-hormonal)">Endometriosis (support)</span>
+          <span class="mt-d-tag" style="background:#E5F2F2;color:var(--cl-thyroid)">Hypothyroid (enrich)</span>
+        </div></td>
+        <td style="font-family:var(--mono);font-size:14px;font-weight:500">3 ÷ 1 = <strong>3.0</strong></td>
+        <td><span class="mt-priority pr-med">High priority</span></td>
+      </tr>
+      <tr>
+        <td><div class="mt-field-name">F3 · Sleep quality</div><div class="mt-field-sub">Duration (hours), quality 1–5, wake events, early morning waking flag</div></td>
+        <td><div class="mt-friction"><div class="friction-dot fd-fill"></div><div class="friction-dot fd-fill"></div><div class="friction-dot fd-empty"></div><div class="friction-dot fd-empty"></div><div class="friction-dot fd-empty"></div></div><div style="font-size:10px;color:var(--muted);margin-top:3px">Daily; 3 questions; moderate compliance risk</div></td>
+        <td><div class="mt-diseases">
+          <span class="mt-d-tag" style="background:#E5EBF9;color:var(--cl-mental)">Depression (support)</span>
+          <span class="mt-d-tag" style="background:#F5EAF2;color:var(--cl-maternal)">PND (support)</span>
+          <span class="mt-d-tag" style="background:#F5EAF8;color:var(--cl-hormonal)">PMDD (support)</span>
+          <span class="mt-d-tag" style="background:#FBF0E8;color:var(--cl-metabolic)">Hypertension (enrich)</span>
+        </div></td>
+        <td style="font-family:var(--mono);font-size:14px;font-weight:500">4 ÷ 2 = <strong>2.0</strong></td>
+        <td><span class="mt-priority pr-med">High priority</span></td>
+      </tr>
+      <tr>
+        <td><div class="mt-field-name">F9 · Body weight</div><div class="mt-field-sub">Self-reported weight; trend tracked over time</div></td>
+        <td><div class="mt-friction"><div class="friction-dot fd-fill"></div><div class="friction-dot fd-fill"></div><div class="friction-dot fd-empty"></div><div class="friction-dot fd-empty"></div><div class="friction-dot fd-empty"></div></div><div style="font-size:10px;color:var(--muted);margin-top:3px">Weekly; requires scale access</div></td>
+        <td><div class="mt-diseases">
+          <span class="mt-d-tag" style="background:#F5EAF8;color:var(--cl-hormonal)">PCOS (support)</span>
+          <span class="mt-d-tag" style="background:#E5F2F2;color:var(--cl-thyroid)">Hypothyroid (support)</span>
+          <span class="mt-d-tag" style="background:#FBF0E8;color:var(--cl-metabolic)">Diabetes (support)</span>
+          <span class="mt-d-tag" style="background:#FBF0E8;color:var(--cl-metabolic)">Hypertension (support)</span>
+          <span class="mt-d-tag" style="background:#F5EAF2;color:var(--cl-maternal)">Pre-eclampsia (enrich)</span>
+        </div></td>
+        <td style="font-family:var(--mono);font-size:14px;font-weight:500">5 ÷ 2 = <strong>2.5</strong></td>
+        <td><span class="mt-priority pr-med">High priority</span></td>
+      </tr>
+      <tr>
+        <td><div class="mt-field-name">F5 · Nutrition log</div><div class="mt-field-sub">Meal groups, iron-rich food frequency, dietary adequacy proxy</div></td>
+        <td><div class="mt-friction"><div class="friction-dot fd-fill"></div><div class="friction-dot fd-fill"></div><div class="friction-dot fd-fill"></div><div class="friction-dot fd-empty"></div><div class="friction-dot fd-empty"></div></div><div style="font-size:10px;color:var(--muted);margin-top:3px">Daily; compliance risk; needs simplification to food groups, not full log</div></td>
+        <td><div class="mt-diseases">
+          <span class="mt-d-tag" style="background:#F0F4E0;color:var(--cl-nutritional)">Anaemia (support)</span>
+          <span class="mt-d-tag" style="background:#FBF0E8;color:var(--cl-metabolic)">GDM (support)</span>
+          <span class="mt-d-tag" style="background:#FBF0E8;color:var(--cl-metabolic)">Diabetes (enrich)</span>
+          <span class="mt-d-tag" style="background:#F5EED8;color:var(--cl-gut)">IBS (enrich)</span>
+        </div></td>
+        <td style="font-family:var(--mono);font-size:14px;font-weight:500">4 ÷ 3 = <strong>1.3</strong></td>
+        <td><span class="mt-priority pr-low">Medium priority</span></td>
+      </tr>
+      <tr>
+        <td><div class="mt-field-name">F10 · Pain &amp; symptoms</div><div class="mt-field-sub">Location, severity NRS 0–10, character (sharp / dull / cramping), duration</div></td>
+        <td><div class="mt-friction"><div class="friction-dot fd-fill"></div><div class="friction-dot fd-fill"></div><div class="friction-dot fd-empty"></div><div class="friction-dot fd-empty"></div><div class="friction-dot fd-empty"></div></div><div style="font-size:10px;color:var(--muted);margin-top:3px">Daily at diary; triggered on pain days</div></td>
+        <td><div class="mt-diseases">
+          <span class="mt-d-tag" style="background:#F5EAF8;color:var(--cl-hormonal)">Endometriosis (core)</span>
+          <span class="mt-d-tag" style="background:#F5EAF8;color:var(--cl-hormonal)">Fibroids (support)</span>
+          <span class="mt-d-tag" style="background:#F5EAF2;color:var(--cl-maternal)">Pre-eclampsia (support)</span>
+          <span class="mt-d-tag" style="background:#F0F4E0;color:var(--cl-nutritional)">Vit D deficiency (support)</span>
+        </div></td>
+        <td style="font-family:var(--mono);font-size:14px;font-weight:500">4 ÷ 2 = <strong>2.0</strong></td>
+        <td><span class="mt-priority pr-med">High priority</span></td>
+      </tr>
+      <tr>
+        <td><div class="mt-field-name">F11 · Blood sugar</div><div class="mt-field-sub">Fasting and post-meal glucose from glucometer</div></td>
+        <td><div class="mt-friction"><div class="friction-dot fd-fill"></div><div class="friction-dot fd-fill"></div><div class="friction-dot fd-fill"></div><div class="friction-dot fd-fill"></div><div class="friction-dot fd-empty"></div></div><div style="font-size:10px;color:var(--muted);margin-top:3px">Requires glucometer device</div></td>
+        <td><div class="mt-diseases">
+          <span class="mt-d-tag" style="background:#FBF0E8;color:var(--cl-metabolic)">GDM (core)</span>
+          <span class="mt-d-tag" style="background:#FBF0E8;color:var(--cl-metabolic)">T2 Diabetes (core)</span>
+        </div></td>
+        <td style="font-family:var(--mono);font-size:14px;font-weight:500">2 ÷ 4 = <strong>0.5</strong></td>
+        <td><span class="mt-priority pr-clinical">Clinical anchor</span></td>
+      </tr>
+      <tr>
+        <td><div class="mt-field-name">F12 · Blood pressure</div><div class="mt-field-sub">Systolic / diastolic from BP cuff</div></td>
+        <td><div class="mt-friction"><div class="friction-dot fd-fill"></div><div class="friction-dot fd-fill"></div><div class="friction-dot fd-fill"></div><div class="friction-dot fd-fill"></div><div class="friction-dot fd-empty"></div></div><div style="font-size:10px;color:var(--muted);margin-top:3px">Requires BP cuff device</div></td>
+        <td><div class="mt-diseases">
+          <span class="mt-d-tag" style="background:#FBF0E8;color:var(--cl-metabolic)">Hypertension (core)</span>
+          <span class="mt-d-tag" style="background:#F5EAF2;color:var(--cl-maternal)">Pre-eclampsia (core)</span>
+        </div></td>
+        <td style="font-family:var(--mono);font-size:14px;font-weight:500">2 ÷ 4 = <strong>0.5</strong></td>
+        <td><span class="mt-priority pr-clinical">Clinical anchor</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- APPENDIX -->
+<div class="appendix">
+  <h2>Appendix — conditions for later consideration</h2>
+  <div class="appendix-note">These conditions are relevant but are either outside the primary population scope for Halla Health's current stage, require clinical infrastructure beyond app-only data collection, or have insufficient LMIC prevalence data to justify prioritising now. Listed for the record so the team can consciously park them.</div>
+  <div class="appendix-grid">
+    <div class="app-card">
+      <div class="app-name">Rheumatoid Arthritis</div>
+      <div class="app-icd">M05 / M06</div>
+      <div class="app-reason">Affects women 2–3× more than men. App signal (joint pain + fatigue + morning stiffness) is non-specific without blood markers.</div>
+      <div class="app-fields">Needs: F10 (morning stiffness sub-field) + HW (RF / anti-CCP blood test)</div>
+    </div>
+    <div class="app-card">
+      <div class="app-name">Lupus (SLE)</div>
+      <div class="app-icd">M32</div>
+      <div class="app-reason">90% female. App signal too non-specific (fatigue, joint pain, rash). Requires blood markers to distinguish from other conditions.</div>
+      <div class="app-fields">Needs: HW (ANA test) + F6 (butterfly rash flag) + F10 + F1</div>
+    </div>
+    <div class="app-card">
+      <div class="app-name">Chronic Fatigue Syndrome (ME/CFS)</div>
+      <div class="app-icd">G93.3</div>
+      <div class="app-reason">Women 2–4× more likely. App can contribute longitudinal fatigue data but diagnosis requires exclusion of other conditions first.</div>
+      <div class="app-fields">Needs: F4 (post-exertional malaise sub-field) + exclusion of F11, HW thyroid and anaemia</div>
+    </div>
+    <div class="app-card">
+      <div class="app-name">Coeliac Disease</div>
+      <div class="app-icd">K90.0</div>
+      <div class="app-reason">Signal via GI symptoms + nutrition, but prevalence in South Asia and East Africa limited. Requires antibody test for meaningful signal.</div>
+      <div class="app-fields">Needs: F7 + F5 (gluten exposure log) + HW (anti-tTG test)</div>
+    </div>
+    <div class="app-card">
+      <div class="app-name">GERD / Acid reflux</div>
+      <div class="app-icd">K21</div>
+      <div class="app-reason">High prevalence in India (~18%), detectable via F7 heartburn flag. Lower pharma DaaS value relative to other conditions at this stage.</div>
+      <div class="app-fields">Needs: F7 (heartburn sub-field) + F5 (dietary trigger log)</div>
+    </div>
+    <div class="app-card">
+      <div class="app-name">Premature Ovarian Insufficiency</div>
+      <div class="app-icd">E28.3</div>
+      <div class="app-reason">Rare (&lt;2% under 40). App signal is cycle cessation + menopause symptoms in young women but population too small for current Halla Health scale.</div>
+      <div class="app-fields">Needs: F2 (cycle cessation) + F3 + F1 + HW (FSH level)</div>
+    </div>
+  </div>
+</div>
+
+</div><!-- .page -->
+</div><!-- #view-map -->
+
+<!-- ══════════════════════════════════════
+  VIEW B: SIGNAL EXPLORER
+══════════════════════════════════════ -->
+<div id="view-explorer">
+<div class="app">
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="sb-top">
+    <div class="sb-brand">
+      <div class="sb-gem">H</div>
+      <span class="sb-name">Halla Health</span>
+    </div>
+    <div class="sb-tagline">Signal Explorer — cross-domain linkages</div>
+  </div>
+  <div class="sb-section">Data streams — toggle active</div>
+  <div class="stream-list" id="streamList"></div>
+  <div class="sb-bottom">
+    <button class="sb-reset" onclick="resetStreams()">Reset to live streams only</button>
+    <div class="sb-count" id="streamCount">0 streams active</div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="map-link-bar">
+    ← <a onclick="switchView('map')">Back to Disease Signal Map</a>
+    &nbsp;·&nbsp; Toggle data streams on the left to see which disease signals emerge from their combination
+  </div>
+  <div class="main-header">
+    <div>
+      <div class="mh-title">Cross-domain signal explorer</div>
+      <div class="mh-sub">Toggle data streams on the left — see which disease signals emerge from their combination</div>
+    </div>
+  </div>
+  <div class="tab-bar">
+    <button class="tab active" id="tab-graph" onclick="switchTab('graph')">Connection graph</button>
+    <button class="tab" id="tab-signal" onclick="switchTab('signal')">Signal strength</button>
+    <button class="tab" id="tab-disease" onclick="switchTab('disease')">By disease</button>
+  </div>
+  <div class="main-body">
+    <svg id="graphView" class="graph-svg"></svg>
+    <div id="signalView"></div>
+    <div id="diseaseView"></div>
+  </div>
+</div>
+
+<!-- DETAIL -->
+<div class="detail">
+  <div class="detail-header">
+    <div class="dh-label">Selected signal</div>
+    <div class="dh-title" id="detailTitle">Select a disease signal</div>
+  </div>
+  <div class="detail-body" id="detailBody">
+    <div class="empty-state">
+      <div class="es-icon">◎</div>
+      <div class="es-title">Nothing selected yet</div>
+      <div class="es-body">Toggle data streams on the left, then click a disease signal node in the graph or a card in Signal Strength view to see the full linkage analysis.</div>
+    </div>
+  </div>
+</div>
+
+</div><!-- .app -->
+</div><!-- #view-explorer -->
+
+<script>
+// ═══════════════════════════════════════════════════════
+// VIEW SWITCHER
+// ═══════════════════════════════════════════════════════
+function switchView(view) {
+  const mapEl = document.getElementById('view-map');
+  const expEl = document.getElementById('view-explorer');
+  const navMap = document.getElementById('nav-map');
+  const navExp = document.getElementById('nav-explorer');
+  const hint = document.getElementById('nav-context-hint');
+
+  if (view === 'map') {
+    mapEl.style.display = 'block';
+    expEl.style.display = 'none';
+    document.body.style.overflow = 'auto';
+    document.body.style.background = '#F5F2EC';
+    navMap.classList.add('active');
+    navExp.classList.remove('active');
+    hint.textContent = 'Clinical reference — expand conditions for full data field specs';
+  } else {
+    mapEl.style.display = 'none';
+    expEl.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+    document.body.style.background = '#0A0E14';
+    navMap.classList.remove('active');
+    navExp.classList.add('active');
+    hint.textContent = 'Interactive cross-domain explorer — toggle streams to see signals emerge';
+    setTimeout(() => { if (currentTab === 'graph') renderGraph(); }, 50);
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// MAP FUNCTIONS
+// ═══════════════════════════════════════════════════════
+function mapToggle(hdr) {
+  const body = hdr.nextElementSibling;
+  const tog = hdr.querySelector('.dc-toggle');
+  const open = body.classList.contains('open');
+  body.classList.toggle('open', !open);
+  tog.textContent = open ? '▾' : '▴';
+}
+
+function mapFilterCluster(cluster, btn) {
+  document.querySelectorAll('#view-map .filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('#view-map .cluster').forEach(c => {
+    c.style.display = (cluster === 'all' || c.dataset.cluster === cluster) ? '' : 'none';
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// EXPLORER — DATA
+// ═══════════════════════════════════════════════════════
+const STREAMS = [
+  {id:'emotion',  name:'Emotional labelling',    theme:'Mental',      color:'#E8607A', live:true,  desc:'Daily mood tags, emotion intensity, valence score. Already live in Halla Health.'},
+  {id:'sleep',    name:'Sleep quality',           theme:'Lifestyle',   color:'#5090E8', live:false, desc:'Sleep duration, quality rating, wake events. Could come from diary or Apple Health.'},
+  {id:'nutrition',name:'Nutrition & diet',        theme:'Lifestyle',   color:'#F0A832', live:false, desc:'Meal logging, food groups, caloric intake, hunger score.'},
+  {id:'skin',     name:'Skin changes',            theme:'Physical',    color:'#70C890', live:false, desc:'Skin condition rating, breakout flag, texture, oiliness — photo or self-report.'},
+  {id:'cycle',    name:'Menstrual cycle',         theme:'Reproductive',color:'#C870C0', live:false, desc:'Cycle length, bleeding days, pain level, flow volume.'},
+  {id:'physical', name:'Physical activity',       theme:'Lifestyle',   color:'#30C8C0', live:false, desc:'Steps, exercise type, intensity, duration.'},
+  {id:'pain',     name:'Pain & symptoms',         theme:'Physical',    color:'#E87040', live:false, desc:'Location, severity (NRS 0-10), duration, character of pain.'},
+  {id:'weight',   name:'Weight & body metrics',   theme:'Physical',    color:'#D8C040', live:false, desc:'Body weight, waist measurement, BMI proxy.'},
+  {id:'blood',    name:'Blood sugar',             theme:'Clinical',    color:'#F05050', live:false, desc:'Fasting and post-meal glucose readings, from glucometer or lab upload.'},
+  {id:'bp',       name:'Blood pressure',          theme:'Clinical',    color:'#E04080', live:false, desc:'Systolic/diastolic readings, heart rate.'},
+  {id:'meds',     name:'Medication adherence',    theme:'Clinical',    color:'#8090E8', live:false, desc:'Which medication taken, time, dose — reminder + confirmation.'},
+  {id:'fatigue',  name:'Fatigue & energy',        theme:'Physical',    color:'#A0C0F0', live:false, desc:'Daily energy rating, fatigue severity, time-of-day pattern.'},
+  {id:'gi',       name:'Gut & GI symptoms',       theme:'Physical',    color:'#90B060', live:false, desc:'Bloating, bowel habit, nausea, diarrhoea, constipation.'},
+  {id:'stress',   name:'Stress & life events',    theme:'Mental',      color:'#D070A0', live:false, desc:'Perceived stress scale, life event log, work/relationship context.'},
+  {id:'pregn',    name:'Pregnancy & antenatal',   theme:'Reproductive',color:'#60C0A0', live:false, desc:'Gestational week, antenatal visit attended, fetal movement.'},
+];
+
+const DISEASES = [
+  {id:'pcos',   name:'PCOS',                icd:'E28.2', streams:['cycle','skin','weight','emotion','fatigue','physical'], required:['cycle','skin'],
+   pharma:'Hormonal therapies (Bayer, AstraZeneca) · fertility treatments · metabolic drugs',
+   mechanism:'Irregular cycles + acne/skin changes + weight fluctuation form the classic PCOS triad. Emotional labelling adds the psychological burden dimension.',
+   missing_benefit:'Adding cycle tracking to emotional labelling immediately creates a PCOS signal candidate — not available in any current LMIC dataset.',
+   weights:{cycle:30,skin:25,weight:20,emotion:15,fatigue:5,physical:5}},
+  {id:'dep',    name:'Depression & anxiety', icd:'F32/F41', streams:['emotion','sleep','physical','stress','fatigue','nutrition'], required:['emotion'],
+   pharma:'Antidepressants (Eli Lilly, Pfizer) · digital therapeutics · mental health platforms',
+   mechanism:'Emotional labelling is the anchor — daily mood tracking creates a longitudinal PHQ proxy. Sleep disruption and physical inactivity compound and amplify mood symptoms.',
+   missing_benefit:'Uganda (30.2% prevalence) and India have almost no structured community mental health data. Longitudinal app data from these populations is genuinely novel.',
+   weights:{emotion:40,sleep:25,physical:10,stress:15,fatigue:5,nutrition:5}},
+  {id:'gdm',    name:'Gestational diabetes', icd:'O24.4', streams:['blood','pregn','nutrition','weight','physical','fatigue'], required:['blood','pregn'],
+   pharma:'Novo Nordisk · Sanofi · Jhpiego · maternal health programs',
+   mechanism:'Blood sugar threshold in pregnancy is the defining criterion. Nutrition and weight gain are primary modifiable drivers. Fatigue is often the first symptom.',
+   missing_benefit:'GDM is massively under-tested in LMIC ANC settings. Blood sugar + pregnancy status creates a 92% signal — highest confidence in the portfolio.',
+   weights:{blood:40,pregn:25,nutrition:15,weight:10,physical:5,fatigue:5}},
+  {id:'thyroid',name:'Thyroid dysfunction',  icd:'E03/E05', streams:['fatigue','weight','emotion','skin','physical','sleep'], required:['fatigue','weight'],
+   pharma:'Merck (levothyroxine) · AbbVie · diagnostic kit manufacturers',
+   mechanism:'Fatigue + unexpected weight change is the most common presenting pattern. Skin dryness and mood disturbance compound the signal. Multi-stream advantage is clearest here.',
+   missing_benefit:'No single stream flags thyroid — requires 3+ co-moving streams. This is where Halla Health\'s multi-domain data has significant advantage over any single-domain tracker.',
+   weights:{fatigue:30,weight:25,emotion:20,skin:15,physical:5,sleep:5}},
+  {id:'endo',   name:'Endometriosis',        icd:'N80',    streams:['pain','cycle','emotion','fatigue','gi','physical'], required:['pain','cycle'],
+   pharma:'AbbVie (elagolix) · Bayer (dienogest) · Myovant Sciences',
+   mechanism:'Cyclic pelvic pain + menstrual data is the core signal. GI symptoms (dyschezia) and fatigue co-movement with cycle phases strengthens it significantly.',
+   missing_benefit:'Pain + cycle together creates an endometriosis probability score that no symptom alone can provide. Adding GI symptoms moves confidence from ~50% to ~75%.',
+   weights:{pain:35,cycle:30,emotion:15,fatigue:10,gi:5,physical:5}},
+  {id:'anaemia',name:'Anaemia (nutritional)', icd:'D50/D53', streams:['fatigue','nutrition','cycle','physical','emotion','pregn'], required:['fatigue'],
+   pharma:'Iron supplement manufacturers · Gates Foundation · maternal health programs',
+   mechanism:'Fatigue is the primary presenting symptom. Heavy menstrual loss combined with poor dietary iron explains most LMIC anaemia. Physical capacity and mood follow.',
+   missing_benefit:'In Uganda and India, anaemia is enormously prevalent but invisible in existing data. Fatigue + heavy cycle + nutrition = probabilistic anaemia signal at scale.',
+   weights:{fatigue:35,nutrition:25,cycle:20,physical:10,emotion:5,pregn:5}},
+  {id:'hyper',  name:'Hypertension',         icd:'I10',    streams:['bp','stress','weight','physical','sleep','emotion'], required:['bp'],
+   pharma:'AstraZeneca · Novartis · Pfizer · government NCD programs',
+   mechanism:'Blood pressure reading is the definitive anchor. Stress + poor sleep + low physical activity + emotional dysregulation are the four modifiable risk factors.',
+   missing_benefit:'BP alone tells you about the condition. BP + stress + sleep + emotional labelling tells pharma about treatment context, adherence barriers, and lifestyle drivers.',
+   weights:{bp:45,stress:20,weight:15,physical:10,sleep:5,emotion:5}},
+  {id:'pnd',    name:'Postnatal depression',  icd:'F53.0',  streams:['emotion','sleep','pregn','stress','fatigue','nutrition'], required:['emotion','pregn'],
+   pharma:'Sage Therapeutics (brexanolone) · Pfizer · Johnson & Johnson · maternal health platforms',
+   mechanism:'Emotional labelling post-birth forms the Edinburgh Depression Scale proxy. Sleep deprivation + emotional negativity co-movement is the classic PND pattern.',
+   missing_benefit:'PND is massively under-diagnosed in LMICs — almost no structured data exists. Pregnancy + emotional labelling post-birth creates the first scalable screening signal.',
+   weights:{emotion:40,sleep:20,pregn:20,stress:10,fatigue:5,nutrition:5}},
+  {id:'ibs',    name:'IBS / gut dysregulation',icd:'K58',   streams:['gi','emotion','nutrition','stress','physical','sleep'], required:['gi'],
+   pharma:'Allergan (IBS drugs) · probiotic/microbiome pharma · Takeda',
+   mechanism:'The gut-brain axis is the core mechanism — GI symptoms and emotional state co-move in IBS. Stress is both a trigger and a symptom amplifier.',
+   missing_benefit:'GI symptoms alone are low value. GI + emotional labelling + stress creates a gut-brain axis signal of high interest to microbiome and IBS drug developers.',
+   weights:{gi:35,emotion:25,nutrition:20,stress:15,physical:3,sleep:2}},
+  {id:'diab2',  name:'Type 2 diabetes risk',  icd:'E11',   streams:['blood','weight','nutrition','physical','fatigue','sleep'], required:['blood'],
+   pharma:'Novo Nordisk · Sanofi · Eli Lilly · AstraZeneca',
+   mechanism:'Blood sugar trajectory is the anchor. Weight gain + poor nutrition + physical inactivity are the three modifiable drivers. Fatigue is often the first symptom.',
+   missing_benefit:'Pre-diabetes and early T2D are largely invisible in LMIC populations without clinical testing. Blood sugar + lifestyle data creates an early warning signal at scale.',
+   weights:{blood:40,weight:20,nutrition:15,physical:15,fatigue:5,sleep:5}},
+];
+
+// ═══════════════════════════════════════════════════════
+// EXPLORER — STATE
+// ═══════════════════════════════════════════════════════
+const active = {};
+STREAMS.forEach(s => { active[s.id] = s.live; });
+let selectedDisease = null;
+let currentTab = 'graph';
+
+// ═══════════════════════════════════════════════════════
+// EXPLORER — SIGNAL CONFIDENCE
+// ═══════════════════════════════════════════════════════
+function getConfidence(disease) {
+  const s = disease.streams, w = disease.weights;
+  let score = 0, maxScore = 0;
+  s.forEach(sid => { const wt = w[sid]||5; maxScore += wt; if(active[sid]) score += wt; });
+  const hasRequired = disease.required.every(r => active[r]);
+  if (!hasRequired) return 0;
+  return Math.round(score / maxScore * 100);
+}
+
+function getSignalLevel(conf) {
+  if (conf >= 70) return {label:'Strong',   color:'#F5E070', bg:'rgba(245,224,112,.15)'};
+  if (conf >= 40) return {label:'Moderate', color:'#F0A030', bg:'rgba(240,160,48,.12)'};
+  if (conf >= 15) return {label:'Weak',     color:'#5088E0', bg:'rgba(80,136,224,.1)'};
+  return {label:'Inactive', color:'#3A4255', bg:'transparent'};
+}
+
+// ═══════════════════════════════════════════════════════
+// EXPLORER — RENDER SIDEBAR
+// ═══════════════════════════════════════════════════════
+function renderSidebar() {
+  const list = document.getElementById('streamList');
+  list.innerHTML = STREAMS.map(s => `
+    <div class="stream-item" onclick="toggleStream('${s.id}')">
+      <div class="si-toggle ${active[s.id]?'on':''}" style="border-color:${active[s.id]?'transparent':s.color};background:${active[s.id]?s.color:'transparent'}"></div>
+      <div class="si-dot" style="background:${s.color};opacity:${active[s.id]?1:.4}"></div>
+      <div class="si-info">
+        <div class="si-name" style="opacity:${active[s.id]?1:.55}">${s.name}</div>
+        <div class="si-theme">${s.theme}</div>
+      </div>
+      ${s.live ? '<span class="si-live">LIVE</span>' : ''}
+    </div>`).join('');
+  const count = Object.values(active).filter(Boolean).length;
+  document.getElementById('streamCount').textContent = count + ' stream' + (count!==1?'s':'') + ' active';
+}
+
+// ═══════════════════════════════════════════════════════
+// EXPLORER — RENDER GRAPH
+// ═══════════════════════════════════════════════════════
+function renderGraph() {
+  const svg = document.getElementById('graphView');
+  const W = svg.clientWidth || 700, H = svg.clientHeight || 500;
+  const cx = W/2, cy = H/2;
+  svg.innerHTML = '';
+  const ns = 'http://www.w3.org/2000/svg';
+  const g = (tag, attrs) => { const el=document.createElementNS(ns,tag); Object.entries(attrs).forEach(([k,v])=>el.setAttribute(k,v)); return el; };
+
+  const defs = g('defs',{});
+  const filter = g('filter',{id:'glow2'});
+  filter.appendChild(g('feGaussianBlur',{in:'SourceGraphic',stdDeviation:'3',result:'blur'}));
+  filter.appendChild(g('feComposite',{in:'SourceGraphic',in2:'blur',operator:'over'}));
+  defs.appendChild(filter); svg.appendChild(defs);
+
+  const streamR = Math.min(W,H)*0.38;
+  const streamPos = {};
+  STREAMS.forEach((s,i) => {
+    const angle = (i/STREAMS.length)*Math.PI*2-Math.PI/2;
+    streamPos[s.id] = {x:cx+Math.cos(angle)*streamR, y:cy+Math.sin(angle)*streamR};
+  });
+
+  const diseaseR = Math.min(W,H)*0.18;
+  const diseasePos = {};
+  const visibleDiseases = DISEASES.filter(d => getConfidence(d) > 0);
+  visibleDiseases.forEach((d,i) => {
+    const angle = (i/Math.max(visibleDiseases.length,1))*Math.PI*2-Math.PI/2;
+    diseasePos[d.id] = {x:cx+Math.cos(angle)*diseaseR, y:cy+Math.sin(angle)*diseaseR};
+  });
+
+  visibleDiseases.forEach(d => {
+    const dp = diseasePos[d.id];
+    d.streams.forEach(sid => {
+      if (!active[sid]) return;
+      const sp = streamPos[sid];
+      const stream = STREAMS.find(s=>s.id===sid);
+      svg.appendChild(g('line',{x1:sp.x,y1:sp.y,x2:dp.x,y2:dp.y,
+        stroke:stream.color,'stroke-width':d.required.includes(sid)?'1.5':'0.7',
+        'stroke-opacity':d.required.includes(sid)?'0.6':'0.25',
+        'stroke-dasharray':d.required.includes(sid)?'':'4,4'}));
+    });
+  });
+
+  STREAMS.forEach(s => {
+    const pos = streamPos[s.id];
+    const isActive = active[s.id];
+    const nodeG = g('g',{style:'cursor:pointer'});
+    nodeG.onclick = () => toggleStream(s.id);
+    nodeG.appendChild(g('circle',{cx:pos.x,cy:pos.y,r:isActive?14:10,
+      fill:isActive?s.color:'transparent',stroke:s.color,'stroke-width':'1.5',
+      opacity:isActive?'1':'0.4',filter:isActive?'url(#glow2)':''}));
+    const lbl = g('text',{x:pos.x,y:pos.y+(pos.y>cy?26:-18),'text-anchor':'middle',
+      'font-size':'9','font-family':'Inter,sans-serif',fill:isActive?s.color:'#3A4255','font-weight':isActive?'600':'400'});
+    lbl.textContent = s.name.split(' ')[0];
+    nodeG.appendChild(lbl);
+    svg.appendChild(nodeG);
+  });
+
+  visibleDiseases.forEach(d => {
+    const conf = getConfidence(d);
+    const pos = diseasePos[d.id];
+    const level = getSignalLevel(conf);
+    const nodeG = g('g',{style:'cursor:pointer'});
+    nodeG.onclick = () => selectDisease(d.id);
+    const r = 16 + conf/10;
+    nodeG.appendChild(g('circle',{cx:pos.x,cy:pos.y,r:r,
+      fill:d.id===selectedDisease?level.color:'#1A2438',stroke:level.color,'stroke-width':'1.5',
+      filter:conf>60?'url(#glow2)':''}));
+    const t1 = g('text',{x:pos.x,y:pos.y-2,'text-anchor':'middle','font-size':'8',
+      'font-family':'Syne,sans-serif','font-weight':'700',fill:d.id===selectedDisease?'#000':level.color});
+    t1.textContent = d.name.length>10?d.name.substring(0,9)+'…':d.name;
+    nodeG.appendChild(t1);
+    const t2 = g('text',{x:pos.x,y:pos.y+9,'text-anchor':'middle','font-size':'8',
+      'font-family':'JetBrains Mono,monospace',fill:d.id===selectedDisease?'#000':'#888'});
+    t2.textContent = conf+'%';
+    nodeG.appendChild(t2);
+    svg.appendChild(nodeG);
+  });
+
+  if (visibleDiseases.length === 0) {
+    const t = g('text',{x:cx,y:cy,'text-anchor':'middle','font-size':'14','font-family':'Syne,sans-serif',fill:'#3A4255'});
+    t.textContent = 'Activate streams to see signals';
+    svg.appendChild(t);
+    const t2 = g('text',{x:cx,y:cy+22,'text-anchor':'middle','font-size':'11','font-family':'Inter,sans-serif',fill:'#2A3A52'});
+    t2.textContent = 'Toggle data streams on the left sidebar';
+    svg.appendChild(t2);
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// EXPLORER — RENDER SIGNAL CARDS
+// ═══════════════════════════════════════════════════════
+function renderSignalView() {
+  const container = document.getElementById('signalView');
+  const sorted = [...DISEASES].map(d=>({...d,conf:getConfidence(d)})).sort((a,b)=>b.conf-a.conf).filter(d=>d.conf>0);
+  const inactive = DISEASES.filter(d=>getConfidence(d)===0);
+
+  if (sorted.length === 0) {
+    container.innerHTML = `<div style="padding:40px;text-align:center;color:#6A7A90"><div style="font-size:14px;margin-bottom:8px;color:#EEE8DC;font-family:Syne,sans-serif">No signals active</div><div style="font-size:12px;line-height:1.6">Activate at least one data stream on the left to see disease signals emerge.</div></div>`;
+    return;
+  }
+
+  const activeCards = sorted.map(d => {
+    const level = getSignalLevel(d.conf);
+    const activeStreamNames = d.streams.filter(sid=>active[sid]).map(sid=>STREAMS.find(s=>s.id===sid));
+    const missingRequired = d.required.filter(r=>!active[r]).map(r=>STREAMS.find(s=>s.id===r)?.name);
+    return `<div class="signal-card" style="border-color:${level.color}33" onclick="selectDisease('${d.id}')">
+      <div class="sc-header"><div class="sc-name">${d.name}</div><span class="sc-conf" style="background:${level.bg};color:${level.color}">${level.label} · ${d.conf}%</span></div>
+      <div class="sc-bar"><div class="sc-bar-fill" style="width:${d.conf}%;background:${level.color}"></div></div>
+      <div class="sc-streams">${activeStreamNames.map(s=>`<span class="sc-stream-tag" style="background:${s.color}22;color:${s.color}">${s.name}</span>`).join('')}</div>
+      ${missingRequired.length?`<div class="sc-missing">Needs to confirm: ${missingRequired.join(', ')}</div>`:''}
+      <div class="sc-icd">${d.icd}</div>
+      <div class="sc-pharma">${d.pharma}</div>
+    </div>`;
+  }).join('');
+
+  const inactiveCards = inactive.map(d=>`
+    <div class="signal-card" style="opacity:.35;cursor:default">
+      <div class="sc-header"><div class="sc-name" style="color:#6A7A90">${d.name}</div><span class="sc-conf" style="background:#2A3A52;color:#6A7A90">Inactive</span></div>
+      <div style="font-size:10.5px;color:#2A3A52">Needs: ${d.required.map(r=>STREAMS.find(s=>s.id===r)?.name).join(', ')}</div>
+    </div>`).join('');
+
+  container.innerHTML = `
+    <div style="margin-bottom:12px;font-size:11px;color:#6A7A90">${sorted.length} active signal${sorted.length!==1?'s':''} · ${inactive.length} inactive · Click any signal to see full analysis</div>
+    <div class="signal-grid">${activeCards}${inactiveCards}</div>`;
+}
+
+// ═══════════════════════════════════════════════════════
+// EXPLORER — RENDER DISEASE VIEW
+// ═══════════════════════════════════════════════════════
+function renderDiseaseView() {
+  const container = document.getElementById('diseaseView');
+  container.innerHTML = `<div class="disease-list">${DISEASES.map(d => {
+    const conf = getConfidence(d), level = getSignalLevel(conf);
+    return `<div class="disease-row ${d.id===selectedDisease?'selected':''}" onclick="selectDisease('${d.id}')">
+      <div class="dr-header">
+        <div class="dr-name" style="color:${level.color||'#EEE8DC'}">${d.name}</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:${level.color}">${conf>0?conf+'%':'—'}</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#6A7A90">${d.icd}</span>
+        </div>
+      </div>
+      <div class="dr-streams">${d.streams.map(sid=>{
+        const s=STREAMS.find(x=>x.id===sid),isActive=active[sid],isRequired=d.required.includes(sid);
+        return `<span class="dr-stream ${isActive?'dr-stream-live':'dr-stream-missing'}" style="background:${isActive?s.color+'22':'#2A3A52'};color:${isActive?s.color:'#6A7A90'}${isRequired?';font-weight:700':''}">${s.name}${isRequired?' *':''}</span>`;
+      }).join('')}</div>
+    </div>`;
+  }).join('')}</div>
+  <div style="font-size:10px;color:#2A3A52;padding:12px 0">* Required streams — disease signal inactive without them</div>`;
+}
+
+// ═══════════════════════════════════════════════════════
+// EXPLORER — RENDER DETAIL PANEL
+// ═══════════════════════════════════════════════════════
+function renderDetail(diseaseId) {
+  const d = DISEASES.find(x=>x.id===diseaseId);
+  if (!d) return;
+  const conf = getConfidence(d), level = getSignalLevel(conf);
+  document.getElementById('detailTitle').textContent = d.name;
+  const missingStreams = d.streams.filter(sid=>!active[sid]).map(sid=>STREAMS.find(s=>s.id===sid));
+
+  let html = `
+    <div class="det-section">
+      <div class="det-sec-title">Signal confidence</div>
+      <div class="conf-meter">
+        <div class="cm-label"><span class="cm-name">Current confidence</span><span class="cm-val" style="color:${level.color}">${conf}% · ${level.label}</span></div>
+        <div class="cm-bar"><div class="cm-fill" style="width:${conf}%;background:${level.color}"></div></div>
+      </div>
+    </div>
+    <div class="det-section">
+      <div class="det-sec-title">Stream contributions</div>
+      <div class="stream-contrib">
+        ${d.streams.map(sid=>{
+          const s=STREAMS.find(x=>x.id===sid),isActive=active[sid],w=d.weights[sid]||5;
+          return `<div class="sc-contrib-row ${isActive?'scr-active':'scr-inactive'}">
+            <div class="scr-dot" style="background:${s.color}"></div>
+            <div class="scr-name">${s.name}${d.required.includes(sid)?' ✦':''}</div>
+            <div class="scr-weight">${w}pts</div>
+          </div>`;
+        }).join('')}
+      </div>
+      <div style="font-size:9.5px;color:#6A7A90">✦ Required — signal inactive without this stream</div>
+    </div>`;
+
+  if (missingStreams.length > 0) {
+    html += `<div class="det-section">
+      <div class="det-sec-title">To strengthen the signal</div>
+      <div class="missing-box">
+        <div class="mb-title">Add these streams to increase confidence</div>
+        <div class="mb-body">${missingStreams.map(s=>`<strong>${s.name}</strong> — ${s.desc}`).join('<br><br>')}</div>
+      </div>
+    </div>`;
+  }
+
+  html += `
+    <div class="det-section">
+      <div class="det-sec-title">Clinical mechanism</div>
+      <div class="mechanism-box">${d.mechanism}</div>
+    </div>
+    <div class="det-section">
+      <div class="det-sec-title">Why this matters for Halla Health</div>
+      <div class="missing-box" style="background:rgba(46,204,138,.08);border-color:#2ECC8A">
+        <div class="mb-title" style="color:#2ECC8A">Data strategy insight</div>
+        <div class="mb-body" style="color:#70D890">${d.missing_benefit}</div>
+      </div>
+    </div>
+    <div class="det-section">
+      <div class="det-sec-title">Pharma buyers</div>
+      <div class="pharma-box"><div class="pb-title">Who pays for this signal</div><div class="pb-body">${d.pharma}</div></div>
+    </div>
+    <div style="background:#1A2438;border:1px solid #263652;border-radius:5px;padding:10px 12px;margin-bottom:12px">
+      <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#6A7A90;margin-bottom:4px">ICD-10 code</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:14px;color:#EEE8DC;font-weight:500">${d.icd}</div>
+    </div>
+    <div style="background:#141D2E;border:1px solid #1E2D44;border-radius:5px;padding:10px 12px;cursor:pointer" onclick="switchView('map')">
+      <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#6A7A90;margin-bottom:4px">Deep reference</div>
+      <div style="font-size:11.5px;color:#5A7A90">View full clinical detail, prevalence data, and F1 spec for this condition in the <span style="color:#F5E070">Disease Signal Map →</span></div>
+    </div>`;
+
+  document.getElementById('detailBody').innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════════════
+// EXPLORER — INTERACTIONS
+// ═══════════════════════════════════════════════════════
+function toggleStream(id) { active[id]=!active[id]; renderAll(); }
+function selectDisease(id) { selectedDisease=id; renderAll(); renderDetail(id); }
+function resetStreams() {
+  STREAMS.forEach(s=>{active[s.id]=s.live;});
+  selectedDisease=null;
+  document.getElementById('detailTitle').textContent='Select a disease signal';
+  document.getElementById('detailBody').innerHTML=`<div class="empty-state"><div class="es-icon">◎</div><div class="es-title">Reset to live streams</div><div class="es-body">Only streams currently live in Halla Health are active. Toggle additional streams to see what signals they unlock.</div></div>`;
+  renderAll();
+}
+function switchTab(tab) {
+  currentTab=tab;
+  ['graph','signal','disease'].forEach(t=>{
+    document.getElementById(t+'View').style.display=t===tab?'block':'none';
+    document.getElementById('tab-'+t).classList.toggle('active',t===tab);
+  });
+  renderAll();
+}
+function renderAll() {
+  renderSidebar();
+  if(currentTab==='graph') renderGraph();
+  if(currentTab==='signal') renderSignalView();
+  if(currentTab==='disease') renderDiseaseView();
+  if(selectedDisease) renderDetail(selectedDisease);
+}
+
+// ═══════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════
+// Open first map card by default
+document.querySelector('#view-map .dc-header') && mapToggle(document.querySelector('#view-map .dc-header'));
+// Init explorer sidebar
+renderSidebar();
+// Handle resize for graph
+window.addEventListener('resize', ()=>{ if(currentTab==='graph' && document.getElementById('view-explorer').style.display!=='none') renderGraph(); });
+</script>
+</body>
+</html>
